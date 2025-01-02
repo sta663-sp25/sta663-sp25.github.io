@@ -1,0 +1,6 @@
+.Rhistory
+*_cache/
+*.sqlite
+*.icloud
+scratch/*
+Sta790_mat/*
