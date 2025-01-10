@@ -2,7 +2,7 @@
 title: "more pandas"
 subtitle: "Lecture 09"
 author: "Dr. Colin Rundel"
-footer: "Sta 663 - Spring 2023"
+footer: "Sta 663 - Spring 2025"
 format:
   revealjs:
     theme: slides.scss

@@ -26,7 +26,7 @@ menu:
     url: https://rstudio.stat.duke.edu
 
 params:
-  subtitle: "(Spring 2023)"
+  subtitle: "(Spring 2025)"
   course: "Sta 663"
   highlightjs: androidstudio
   highlightjs_extra_languages:

@@ -9,13 +9,17 @@ schedule:
 - week: 0
   day: 5
   lecture: "Welcome & Syllabus"
-  slides: 
+  slides: Lec01
   screencast: 
   readings: 
   - text: ssh config for GitHub
     link: https://github.com/DukeStatSci/github_auth_guide
   notes:
 
+- week: 1
+  day: 2
+  lecture: "<i>No lab</i>"
+  
 - week: 1
   day: 3
   lecture: "Python - Basic types & sequence types"
