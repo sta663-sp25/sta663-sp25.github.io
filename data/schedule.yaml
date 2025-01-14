@@ -23,7 +23,7 @@ schedule:
 - week: 1
   day: 3
   lecture: "Python - Basic types & sequence types"
-  slides: 
+  slides: Lec02
   screencast: 
   readings:
   - text: Python Built-in Types

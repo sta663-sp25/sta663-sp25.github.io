@@ -35,7 +35,7 @@ local({
 
 ## Type system basics
 
-Like R, Python is a dynamically typed language but the implementation details are very different as it makes extensive use of an object oriented class system for implementation (more on this later)
+Like R, Python is a dynamically typed language but the implementation details are very different as it makes extensive use of an object oriented class system for implementation (more on in a bit)
 
 :::: {.columns .small}
 ::: {.column width='50%'}
@@ -48,7 +48,7 @@ True
 ```
 :::
 
-::: {.column width='50%'}
+::: {.column width='50%' .fragment}
 ```{python}
 type(True)
 type(1)
@@ -60,12 +60,12 @@ type("string")
 ::::
 
 ::: {.aside}
-Note - all of these types are *scalar* values.
+Note - all of these types are exclusively *scalar* values, more on vector types to come.
 :::
 
 ## Dynamic types
 
-As just mentioned, Python is dynamically typed langiage so most basic operations will attempt to coerce object to a consistent type appropriate for the operation.
+As a dynamically typed langiage most basic operations will attempt to coerce object to a consistent type appropriate for the operation.
 
 :::: {.columns .small}
 ::: {.column width='50%'}
@@ -93,6 +93,8 @@ not (0+1j)
 
 ## Mathematical operations
 
+
+
 :::: {.columns}
 ::: {.column width='50%'}
 ```{python}
@@ -114,6 +116,8 @@ True * 5
 ```
 :::
 ::::
+
+Note that the default numeric type in python is an *integer* rather than a *float point*, but floats will generally take precedence over integers.
 
 ## Coercion errors
 
@@ -148,10 +152,6 @@ Python is not quite as liberal as R when it comes to type coercion,
 "abc" * 3
 ```
 :::
-
-. . .
-
-More on why this happens in a little bit...
 
 
 ## Casting
@@ -236,17 +236,19 @@ line three"""
 ```
 :::
 
-. . .
+::: aside
+This last example are are particularly commonly used for [docstrings](https://peps.python.org/pep-0257/)
+:::
 
-a `\` can also be used to span a long string over multiple lines without including the newline
+## Multiline strings
 
-::: {.small}
+A `\` can also be used to span a long string over multiple lines without including the newline
+
 ```{python}
 "line one \
 not line two \
 not line three"
 ```
-:::
 
 ## f strings
 
@@ -299,15 +301,29 @@ By default Python does not support missing values and non-finite floating point 
 1/0
 1./0
 float("nan")
-float("-inf")
 ```
 :::
 
 ::: {.column width='50%' .fragment}
 ```{python}
+float("-inf")
 5 > float("inf")
 5 > float("-inf")
+```
+:::
+::::
+
+. . .
+
+:::: {.columns .small}
+::: {.column width='50%'}
+```{python error=TRUE}
 None
+```
+:::
+
+::: {.column width='50%'}
+```{python}
 type(None)
 ```
 :::
@@ -315,7 +331,7 @@ type(None)
 
 
 ::: {.aside}
-We will not be using these values much currently, but they will be relevant when discussing pandas in a couple of weeks
+We will not be using these values much at the moment, but they will be relevant when discussing pandas in a couple of weeks
 :::
 
 
@@ -325,7 +341,8 @@ We will not be using these values much currently, but they will be relevant when
 
 Python lists are a *heterogenous*, *ordered*, *mutable* containers of objects (they behave very similarly to lists in R).
 
-::: {.small}
+:::: {.columns .small}
+::: {.column width='50%'}
 ```{python}
 [0,1,1,0]
 [0, True, "abc"]
@@ -333,9 +350,7 @@ Python lists are a *heterogenous*, *ordered*, *mutable* containers of objects (t
 ```
 :::
 
-. . .
-
-::: {.small}
+::: {.column width='50%' .fragment}
 ```{python}
 x = [0,1,1,0]
 type(x)
@@ -344,11 +359,8 @@ y = [0, True, "abc"]
 type(y)
 ```
 :::
+::::
 
-
-::: {.aside}
-More on the underlying data structure and its properties next time
-:::
 
 ## Common operations
 
@@ -356,7 +368,9 @@ More on the underlying data structure and its properties next time
 ::: {.column width='50%'}
 ```{python}
 x = [0,1,1,0]
+```
 
+```{python}
 2 in x
 2 not in x
 x + [3,4,5]
@@ -374,9 +388,8 @@ x.count("1")
 :::
 ::::
 
-::: {.aside}
 See [here](https://docs.python.org/3/library/stdtypes.html#common-sequence-operations) and [here](https://docs.python.org/3/library/stdtypes.html#mutable-sequence-types) for a more complete listing of functions and methods.
-:::
+
 
 ## list subsetting 
 
@@ -517,6 +530,8 @@ x
 y
 ```
 
+
+
 ## lists, assignment, and mutability
 
 To avoid this we need to make an explicit copy of the object pointed to by `x` and point to it with the name `y`.
@@ -539,8 +554,35 @@ x
 y
 ```
 
-::: {.aside}
-More on `.copy()` and `.deepcopy()` methods later on in the course.
+
+## Nested lists
+
+Now lets look at happens when we have a list inside a list and make a change at either level.
+
+::: {.small}
+```{python}
+x = [0, [1,2], [3,4]]
+y = x.copy()
+z = x.copy()
+
+x[0] = -1
+x[1][0] = 5
+```
+:::
+
+. . .
+
+What are the values of `x`, `y`, and `z` now?
+
+. . . 
+
+
+::: {.small}
+```{python}
+x
+y
+z
+```
 :::
 
 
