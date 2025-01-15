@@ -35,7 +35,7 @@ local({
 
 ## Type system basics
 
-Like R, Python is a dynamically typed language but the implementation details are very different as it makes extensive use of an object oriented class system for implementation (more on in a bit)
+Like R, Python is a dynamically typed language but the implementation details are very different as it makes extensive use of an object oriented class system for implementation
 
 :::: {.columns .small}
 ::: {.column width='50%'}
@@ -117,7 +117,7 @@ True * 5
 :::
 ::::
 
-Note that the default numeric type in python is an *integer* rather than a *float point*, but floats will generally take precedence over integers.
+Note that the default numeric type in python is an *integer* rather than a *double*, but floats will generally take precedence over integers.
 
 ## Coercion errors
 
@@ -215,7 +215,7 @@ Python variable names can be of any length, and must only contain letters, numbe
 
 ## string literals
 
-Strings can be defined using a couple of different approaches,
+Strings can be defined using several different approaches,
 
 ::: {.small}
 ```{python}
@@ -226,23 +226,23 @@ Strings can be defined using a couple of different approaches,
 
 . . .
 
-strings can also be triple quoted, using single or double quotes, which allows the string to span multiple lines.
+strings can also be triple quoted, using single or double quotes, which allows the string to span multiple lines and contain quote characters,
 
 ::: {.small}
 ```{python}
 """line one
-line two
-line three"""
+line "two"
+line 'three'"""
 ```
 :::
 
 ::: aside
-This last example are are particularly commonly used for [docstrings](https://peps.python.org/pep-0257/)
+This last example are are particularly common with [docstrings](https://peps.python.org/pep-0257/)
 :::
 
 ## Multiline strings
 
-A `\` can also be used to span a long string over multiple lines without including the newline
+A single `\` can also be used to span a long string over multiple lines without including the newline
 
 ```{python}
 "line one \
@@ -263,7 +263,7 @@ f"{x} has {len(x)} elements"
 ```
 
 ::: {.aside}
-See [PEP 498](https://peps.python.org/pep-0498/)
+See [PEP 498](https://peps.python.org/pep-0498/) for more details
 :::
 
 
@@ -293,19 +293,23 @@ print(r"ab\tcd")
 
 ## Special values
 
-By default Python does not support missing values and non-finite floating point values are available but somewhat awkward to use. There is also a `None` type which is similar in spirit and functionality to `NULL` in R.
+::: {.medium}
+Base Python does not support missing values. Non-finite floating point values are available but somewhat awkward to use. There is also a `None` type which is similar in usage and functionality to `NULL` in R.
+:::
 
 :::: {.columns .small}
 ::: {.column width='50%'}
 ```{python error=TRUE}
 1/0
 1./0
+nan
 float("nan")
 ```
 :::
 
 ::: {.column width='50%' .fragment}
-```{python}
+```{python error=TRUE}
+inf
 float("-inf")
 5 > float("inf")
 5 > float("-inf")
@@ -330,16 +334,12 @@ type(None)
 ::::
 
 
-::: {.aside}
-We will not be using these values much at the moment, but they will be relevant when discussing pandas in a couple of weeks
-:::
-
 
 # Sequence types
 
 ## lists
 
-Python lists are a *heterogenous*, *ordered*, *mutable* containers of objects (they behave very similarly to lists in R).
+Python lists are   *heterogenous*, *ordered*, *mutable* containers of objects (they are very similarly to lists in R).
 
 :::: {.columns .small}
 ::: {.column width='50%'}
@@ -393,7 +393,7 @@ See [here](https://docs.python.org/3/library/stdtypes.html#common-sequence-opera
 
 ## list subsetting 
 
-Elements of a list can be accessed using the `[]` method, element position is indicated using 0-based indexing, and ranges of values can be specified using slices (`start:stop:step`).
+Elements of a list can be accessed using the `[]` method, element position is indicated using **0-based indexing**, and ranges of values can be specified using slices (`start:stop:step`).
 
 ::: {}
 ```{python}
@@ -425,7 +425,7 @@ x[:3]
 When using a slice the default values are `0:length(x):1`
 :::
 
-## slice w/ step
+## slice with a step
 
 ::: {}
 ```{python}
@@ -562,7 +562,7 @@ Now lets look at happens when we have a list inside a list and make a change at 
 ::: {.small}
 ```{python}
 x = [0, [1,2], [3,4]]
-y = x.copy()
+y = x
 z = x.copy()
 
 x[0] = -1
@@ -594,10 +594,15 @@ lists (and other sequence types) can be unpacking into multiple variables when d
 ::: {.column width='50%'}
 ```{python}
 x, y = [1,2]
+```
+```{python}
 x
 y
-
+```
+```{python}
 x, y = [1, [2, 3]]
+```
+```{python}
 x
 y
 ```
@@ -606,10 +611,15 @@ y
 ::: {.column width='50%' .fragment}
 ```{python}
 x, y = [[0,1], [2, 3]]
+```
+```{python}
 x
 y
-
+```
+```{python}
 (x1,y1), (x2,y2) = [[0,1], [2, 3]]
+```
+```{python}
 x1
 y1
 x2
@@ -627,6 +637,8 @@ It is also possible to use extended unpacking via the `*` operator (in Python 3)
 ::: {.column width='50%'}
 ```{python error=TRUE}
 x, *y = [1,2,3]
+```
+```{python}
 x
 y
 ```
@@ -635,6 +647,8 @@ y
 ::: {.column width='50%' .fragment}
 ```{python error=TRUE}
 *x, y = [1,2,3]
+```
+```{python}
 x
 y
 ```
@@ -653,7 +667,7 @@ x, y = [1,2,3]
 
 ## tuples
 
-Python tuples are a *heterogenous*, *ordered*, *immutable* containers of values. 
+Python tuples are *heterogenous*, *ordered*, **immutable** containers of values. 
 
 They are nearly identical to lists except that their values cannot be changed - you will most often encounter them as a tool for packaging multiple objects when returning from a function.
 
@@ -730,7 +744,7 @@ What makes ranges special is that `range(1000000)` does not store 1 million inte
 
 ## Strings as sequences
 
-In most of the ways that count we can think about Python strings as being ordered, immutable, containers of unicode characters and so much of the functionality we just saw can be applied to them.
+In most of the ways that count we can think about Python strings as being *ordered* *immutable* containers of unicode characters and so much of the sequence type functionality we just saw can be applied to them.
 
 ::: {.small}
 ```{python}
@@ -768,7 +782,7 @@ x[2] = "c"
 
 ## String Methods
 
-Because string processing is a common and important programming task, the class implements a number of specific methods for these tasks. Review the page linked on the previous slide for help.
+Because string processing is a common and important programming task, the `str` class implements a number of additional methods for these specific tasks. See [here](https://docs.python.org/3/library/stdtypes.html#string-methods) a list of methods.
 
 ```{python}
 x = "Hello world! 1234"
@@ -797,9 +811,6 @@ x.split(" ")
 ::::
 
 
-::: {.aside}
-Find a more complete list of functions  [here](https://docs.python.org/3/library/stdtypes.html#string-methods)
-:::
 
 ## Exercise 2
 
