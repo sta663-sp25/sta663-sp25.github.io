@@ -35,7 +35,7 @@ schedule:
 - week: 1
   day: 5
   lecture: "Python - Control flow, list comprehensions and functions"
-  slides: 
+  slides: Lec03
   screencast: 
   readings:
   - text: Control flow
