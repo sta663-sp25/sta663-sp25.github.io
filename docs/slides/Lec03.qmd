@@ -271,7 +271,7 @@ List comprehensions can include a conditional clause(s) to filter the input list
 
 . . .
 
-The comprehension can include multiple `if` statements (which are combined via `and`)
+The comprehension can include multiple `if` statements (equivalent to using `and`)
 
 ```{python}
 [x**2 for x in range(10) if x % 2 == 0 if x % 3 ==0]
@@ -281,7 +281,7 @@ The comprehension can include multiple `if` statements (which are combined via `
 
 ## Multiple `for` keywords
 
-Similarly, the comprehension can also contain multiple `for` statements which is the equivalent of nested `for` loops,
+Similarly, the comprehension can also contain multiple `for` statements which is equivalent to nested `for` loops,
 
 ```{python}
 res = []
@@ -324,7 +324,7 @@ list(z)
 :::
 
 ::: {.aside}
-The zip object is an example of a [generator](https://wiki.python.org/moin/Generators) which we will talk more about in future lectures.
+The zip object is an example of a [generator](https://wiki.python.org/moin/Generators) which we will talk more about in a bit
 :::
 
 
@@ -336,10 +336,11 @@ The length of the shortest sequence will be used, additional elements will be ig
 x = [1,2,3,4]
 y = range(3)
 z = "ABCDE"
+```
 
+```{python}
 list(zip(x,y))
 list(zip(x,z))
-
 list(zip(x,y,z))
 ```
 
@@ -356,11 +357,16 @@ Using list comprehensions, complete the following tasks:
 * Count the number of points $x$ or $y$ is prime.
 
 
+```{r}
+#| echo: false
+countdown::countdown(5)
+```
+
 # Functions
 
 ## Basic functions
 
-Functions are defined using `def`, arguments can be defined with or without default values. (Arguments with defaults *must* must follow the arguments without defaults)
+Functions are defined using `def`, arguments can optionally have a default values. (Arguments with defaults *must* must follow the arguments without defaults)
 
 ```{python}
 def f(x, y=2, z=3):
@@ -698,3 +704,312 @@ f(1,2,3)
 <br/>
 
 2. Write a second function, `total_lb`, that calculates the total weight in pounds of an order, the input arguments should be a list of item weights in kilograms and a list of the number of each item ordered.
+
+```{r}
+#| echo: false
+countdown::countdown(5)
+```
+
+
+# Classes
+
+## Basic syntax
+
+These are the basic component of Python's object oriented system - we've been using them regularly all over the place and will now look at how they are defined and used.
+
+:::: {.columns .xsmall}
+::: {.column width='50%'}
+```{python}
+class rect:
+  """An object representing a rectangle"""
+  
+  # Attributes
+  p1 = (0,0)
+  p2 = (1,2)
+  
+  # Methods
+  def area(self):
+    return ((self.p1[0] - self.p2[0]) *
+            (self.p1[1] - self.p2[1]))
+           
+  def set_p1(self, p1):
+    self.p1 = p1
+  
+  def set_p2(self, p2):
+    self.p2 = p2
+```
+:::
+
+::: {.column width='50%' .fragment}
+```{python}
+x = rect()
+```
+
+```{python}
+x.area()
+
+x.set_p2((1,1))
+x.area()
+
+x.p1
+x.p2
+
+x.p2 = (0,0)
+x.area()
+```
+:::
+::::
+
+
+## Instantiation (constructors)
+
+When instantiating a class object (e.g. `rect()`) we invoke the `__init__()` method if it is present in the classes' definition.
+
+:::: {.columns .xsmall}
+::: {.column width='50%'}
+```{python}
+class rect:
+  """An object representing a rectangle"""
+  
+  # Constructor
+  def __init__(self, p1 = (0,0), p2 = (1,1)):
+    self.p1 = p1
+    self.p2 = p2
+  
+  # Methods
+  def area(self):
+    return ((self.p1[0] - self.p2[0]) *
+            (self.p1[1] - self.p2[1]))
+           
+  def set_p1(self, p1):
+    self.p1 = p1
+  
+  def set_p2(self, p2):
+    self.p2 = p2
+```
+:::
+
+::: {.column width='50%' .fragment}
+```{python}
+x = rect()
+x.area()
+
+y = rect((0,0), (3,3))
+y.area()
+
+z = rect((-1,-1))
+z.p1
+z.p2
+```
+:::
+::::
+
+
+## Method chaining
+
+We've seen a number of objects (i.e. Pandas DataFrames) that allow for method chaining to construct a pipeline of operations. We can achieve the same by having our class methods return itself via `self`.
+
+:::: {.columns .small}
+::: {.column width='50%'}
+```{python}
+class rect:
+  """An object representing a rectangle"""
+  
+  # Constructor
+  def __init__(self, p1 = (0,0), p2 = (1,1)):
+    self.p1 = p1
+    self.p2 = p2
+  
+  # Methods
+  def area(self):
+    return ((self.p1[0] - self.p2[0]) *
+            (self.p1[1] - self.p2[1]))
+           
+  def set_p1(self, p1):
+    self.p1 = p1
+    return self
+  
+  def set_p2(self, p2):
+    self.p2 = p2
+    return self
+```
+:::
+
+::: {.column width='50%' .fragment}
+```{python}
+rect().area()
+
+rect().set_p1((-1,-1)).area()
+
+( rect()
+  .set_p1((-1,-1))
+  .set_p2((2,2))
+  .area()
+)
+```
+:::
+::::
+
+
+## Class object string formating
+
+All class objects have a default print method / string conversion method, but the default behavior is not very useful,
+
+:::: {.columns .small}
+::: {.column width='50%'}
+```{python}
+print(rect())
+```
+:::
+
+::: {.column width='50%'}
+```{python}
+str(rect())
+```
+:::
+::::
+
+. . .
+
+Both of the above are handled by the `__str__()` method which is implicitly created for our class - we can override this,
+
+::: {.small}
+```{python}
+def rect_str(self):
+  return f"Rect[{self.p1}, {self.p2}] => area={self.area()}"
+
+rect.__str__ = rect_str
+```
+:::
+
+. . .
+
+::: {.small}
+```{python}
+rect()
+print(rect())
+str(rect())
+```
+:::
+
+## Class representation
+
+There is another special method which is responsible for the printing the object (see `rect()` above) called `__repr__()` which is responsible for printing the classes representation. If possible this is meant to be a valid Python expression capable of recreating the object.
+
+::: {.small}
+```{python}
+def rect_repr(self):
+  return f"rect({self.p1}, {self.p2})"
+
+rect.__repr__ = rect_repr
+```
+:::
+
+. . .
+
+::: {.small}
+```{python}
+rect()
+repr(rect())
+```
+:::
+
+
+## Inheritance
+
+Part of the object oriented system is that classes can inherit from other classes, meaning they gain access to all of their parents attributes and methods. We will not go too in depth on this topic beyond showing the basic functionality.
+
+::: {.small}
+```{python}
+class square(rect):
+    pass
+```
+:::
+
+. . .
+
+::: {.small}
+```{python}
+square()
+square().area()
+square().set_p1((-1,-1)).area()
+```
+:::
+
+
+## Overriding methods
+
+:::: {.columns .xsmall}
+::: {.column width='50%'}
+```{python}
+class square(rect):
+    def __init__(self, p1=(0,0), l=1):
+      assert isinstance(l, (float, int)), \
+             "l must be a numnber"
+      
+      p2 = (p1[0]+l, p1[1]+l)
+      
+      self.l  = l
+      super().__init__(p1, p2)
+    
+    def set_p1(self, p1):
+      self.p1 = p1
+      self.p2 = (self.p1[0]+self.l, self.p1[1]+self.l)
+      return self
+    
+    def set_p2(self, p2):
+      raise RuntimeError("Squares take l not p2")
+    
+    def set_l(self, l):
+      assert isinstance(l, (float, int)), \
+             "l must be a numnber"
+      
+      self.l  = l
+      self.p2 = (self.p1[0]+l, self.p1[1]+l)
+      return self
+    
+    def __repr__(self):
+      return f"square({self.p1}, {self.l})"
+```
+:::
+
+::: {.column width='50%' .fragment}
+```{python error=TRUE}
+square()
+square().area()
+square().set_p1((-1,-1)).area()
+square().set_l(2).area()
+
+square((0,0), (1,1))
+square().set_l((0,0))
+square().set_p2((0,0))
+```
+:::
+::::
+
+
+## Class attributes
+
+We can examine all of a classes' methods and attributes using `dir()`,
+
+```{python}
+[
+  dir(rect)
+]
+```
+
+. . .
+
+<br/>
+
+::: {.center}
+Where did `p1` and `p2` go?
+:::
+
+##
+
+```{python}
+[
+  dir(rect())
+]
+```
