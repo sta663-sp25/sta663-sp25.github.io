@@ -42,6 +42,8 @@ schedule:
     link: https://docs.python.org/3/tutorial/controlflow.html
   - text: List Comprehensions
     link: https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions
+  - text: Classes
+    link: https://docs.python.org/3/tutorial/classes.html
   notes: 
 
 - week: 2
