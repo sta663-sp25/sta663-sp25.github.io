@@ -576,7 +576,11 @@ To tie things back to Sta 523 - the following R objects are implemented using th
 
 - Generic vectors (lists) - Array of SEXPs (R object pointers)
 
-- Environments - Hash map
+- Environments - Hash map with string-based keys
 
 - Pairlists - Linked list
 
+
+::: {.aside}
+Environments are not a great option for a general hash map, see `utils::hashtab()` instead.
+:::

@@ -48,6 +48,11 @@ schedule:
 
 - week: 2
   day: 3
+  lecture: "<i>Class canceled</i> - Snow"
+
+
+- week: 2
+  day: 5
   lecture: "Data structures"
   slides: Lec04
   screencast: 
@@ -58,8 +63,8 @@ schedule:
     link: https://wiki.python.org/moin/TimeComplexity
   notes:
   
-- week: 2
-  day: 5
+- week: 3
+  day: 3
   lecture: "NumPy"
   slides: 
   screencast: 
@@ -71,8 +76,8 @@ schedule:
   notes: 
 
 - week: 3
-  day: 3
-  lecture: "NumPy - Advanced indexing & Broadcasting"
+  day: 5
+  lecture: "NumPy / JAX"
   slides: 
   screencast: 
   readings:
@@ -80,15 +85,6 @@ schedule:
     link: https://numpy.org/doc/stable/user/basics.broadcasting.html
   - text: Advanced indexing
     link: https://numpy.org/doc/stable/user/basics.indexing.html#advanced-indexing
-  notes: 
-
-- week: 3
-  day: 5
-  lecture: "JAX"
-  slides: 
-  screencast: 
-  notes:
-  readings:
   notes: 
 
 - week: 4

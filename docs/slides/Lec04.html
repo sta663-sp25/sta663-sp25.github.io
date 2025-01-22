@@ -1105,7 +1105,7 @@ Dr. Colin Rundel
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href></a>{<span class="dv">1</span>: <span class="st">&quot;abc&quot;</span>, <span class="fl">1.1</span>: (<span class="dv">1</span>,<span class="dv">1</span>), <span class="st">&quot;one&quot;</span>: [<span class="st">&quot;a&quot;</span>,<span class="st">&quot;n&quot;</span>], (<span class="dv">1</span>,<span class="dv">1</span>): <span class="kw">lambda</span> x: x<span class="op">**</span><span class="dv">2</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>{1: &#39;abc&#39;, 1.1: (1, 1), &#39;one&#39;: [&#39;a&#39;, &#39;n&#39;], (1, 1): &lt;function &lt;lambda&gt; at 0x126ec49a0&gt;}</code></pre>
+<pre><code>{1: &#39;abc&#39;, 1.1: (1, 1), &#39;one&#39;: [&#39;a&#39;, &#39;n&#39;], (1, 1): &lt;function &lt;lambda&gt; at 0x10df389a0&gt;}</code></pre>
 </div>
 </div>
 <div class="fragment">
@@ -1332,7 +1332,7 @@ y hello</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href></a><span class="bu">set</span>(<span class="st">&quot;mississippi&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>{&#39;s&#39;, &#39;p&#39;, &#39;i&#39;, &#39;m&#39;}</code></pre>
+<pre><code>{&#39;m&#39;, &#39;i&#39;, &#39;s&#39;, &#39;p&#39;}</code></pre>
 </div>
 </div>
 <div class="fragment">
@@ -1517,7 +1517,7 @@ y hello</code></pre>
 <div class="sourceCode cell-code" id="cb124"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb124-1"><a href></a><span class="co"># Set</span></span>
 <span id="cb124-2"><a href></a>{x.lower() <span class="cf">for</span> x <span class="kw">in</span> <span class="st">&quot;The quick brown fox jumped a lazy dog&quot;</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>{&#39;r&#39;, &#39;a&#39;, &#39;m&#39;, &#39; &#39;, &#39;w&#39;, &#39;k&#39;, &#39;p&#39;, &#39;z&#39;, &#39;q&#39;, &#39;b&#39;, &#39;u&#39;, &#39;t&#39;, &#39;f&#39;, &#39;d&#39;, &#39;n&#39;, &#39;h&#39;, &#39;o&#39;, &#39;g&#39;, &#39;i&#39;, &#39;j&#39;, &#39;c&#39;, &#39;x&#39;, &#39;y&#39;, &#39;l&#39;, &#39;e&#39;}</code></pre>
+<pre><code>{&#39;j&#39;, &#39;g&#39;, &#39;z&#39;, &#39;i&#39;, &#39;x&#39;, &#39;d&#39;, &#39;y&#39;, &#39;a&#39;, &#39;n&#39;, &#39;f&#39;, &#39;e&#39;, &#39;h&#39;, &#39;p&#39;, &#39;k&#39;, &#39;l&#39;, &#39;b&#39;, &#39;w&#39;, &#39; &#39;, &#39;q&#39;, &#39;m&#39;, &#39;c&#39;, &#39;u&#39;, &#39;o&#39;, &#39;t&#39;, &#39;r&#39;}</code></pre>
 </div>
 </div>
 <div class="fragment">
@@ -1540,7 +1540,7 @@ y hello</code></pre>
 <div class="sourceCode cell-code" id="cb128"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb128-1"><a href></a><span class="co"># Not a tuple</span></span>
 <span id="cb128-2"><a href></a>(x<span class="op">**</span><span class="dv">2</span> <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>&lt;generator object &lt;genexpr&gt; at 0x126f13b90&gt;</code></pre>
+<pre><code>&lt;generator object &lt;genexpr&gt; at 0x10df87b90&gt;</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -1843,11 +1843,14 @@ y hello</code></pre>
 <ul>
 <li><p>Atomic vectors - Array of the given type (int, double, etc.)</p></li>
 <li><p>Generic vectors (lists) - Array of SEXPs (R object pointers)</p></li>
-<li><p>Environments - Hash map</p></li>
+<li><p>Environments - Hash map with string-based keys</p></li>
 <li><p>Pairlists - Linked list</p></li>
 </ul>
 
-</section></section>
+
+<aside><div>
+<p>Environments are not a great option for a general hash map, see <code>utils::hashtab()</code> instead.</p>
+</div></aside></section></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">
