@@ -58,10 +58,14 @@ dict(hello=123, world=456) # cant use def here as it is reserved
 ```
 :::
 
+::: {.aside}
+As of Python 3.7 dictionaries are ordered by insertion order.
+:::
+
 
 ## Allowed key values
 
-keys for a `dict` must be an immutable object (e.g. number, string, or tuple) and keys do not need to be of a consistent type.
+keys for a `dict` must be an immutable object (e.g. number, string, or tuple) and keys may be of any type (mutable or immutable).
 
 ```{python}
 {1: "abc", 1.1: (1,1), "one": ["a","n"], (1,1): lambda x: x**2}
@@ -69,7 +73,7 @@ keys for a `dict` must be an immutable object (e.g. number, string, or tuple) an
 
 . . .
 
-Using a mutable object (e.g. a list) will result in an error,
+Using a mutable object (e.g. a list) as a key will result in an error,
 
 ```{python error=TRUE}
 {[1]: "bad"}
@@ -84,7 +88,7 @@ when using a tuple, you need to be careful that all elements are also immutable,
 
 ## dict "subsetting"
 
-The `[]` operator exists for `dict`s but is used for value look up using a key,
+The `[]` operator exists for `dict`s but is used for key-based value look ups,
 
 ::: {.small}
 ```{python}
@@ -195,10 +199,10 @@ See more about view objects [here](https://docs.python.org/3/library/stdtypes.ht
 
 ## Iterating dictionaries
 
-Dictionaries can be used with for loops (and list comprehensions). These loops iterates over the *keys* only, to iterate over the *keys* and *values* use the `items()` method.
+Dictionaries can be used with for loops (and list comprehensions). These loops iterates over the *keys* only, to iterate over the *keys* and *values* use `items()`.
 
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
 for z in {1: 'abc', 'y': 'hello'}:
@@ -218,6 +222,20 @@ for k,v in {1: 'abc', 'y': 'hello'}.items():
 :::
 ::::
 
+## Exercise 1
+
+Write a function that takes a two dictionaries as an arguments and merges them into a single dictionary. If there are any duplicate keys, the value from the second dictionary should be used.
+
+```{python}
+x = {"a": 1, "b": 2, "c": 3}
+y = {"c": 5, "d": 6, "e": 7}
+
+def merge(d1, d2):
+  return NULL
+```
+
+
+
 # Sets
 
 
@@ -225,7 +243,7 @@ for k,v in {1: 'abc', 'y': 'hello'}.items():
 
 In Python a `set` is a *heterogenous*, *unordered*, *mutable* container of **unique** immutable elements.
 
-A `set` is constructed using `{}` (without a `:`) or via `set()`,
+A `set` is constructed using `{}` (without using `:`) or via `set()`,
 
 ```{python}
 {1,2,3,4,1,2}
@@ -380,27 +398,22 @@ Note that `tuple` comprehensions do not exist,
 (x**2 for x in range(5))
 ```
 
+instead you can use a list comprehension which is then cast to a tuple
+
 ```{python}
 # Is a tuple - via casting a list to tuple
 tuple([x**2 for x in range(5)])
 tuple(x**2 for x in range(5))
 ```
 
-::: {.aside}
-More on generators in a couple weeks
-:::
-
 
 ## deques (double ended queue)
 
-These are *heterogenous*, *ordered*, *mutable* collections of elements and behave in much the same way as `list`s. They are designed to be efficient for adding and removing elements from the beginning and end of the collection.
+are *heterogenous*, *ordered*, *mutable* collections of elements and behave in much the same way as `list`s. They are designed to be efficient for adding and removing elements from the beginning and end of the collection.
 
-These are not part of the base language and are available as part of the built-in `collections` library. More on libraries next time, but to get access we will need to import the library or  the `deque` function from the library.
 
-```{python}
-import collections
-collections.deque([1,2,3])
-```
+These are not part of the base language and are available as part of the built-in `collections` library. We will discuss libraries next time, for now to get access we will import the `deque` function from `collections`.
+
 
 ```{python}
 from collections import deque
@@ -432,10 +445,21 @@ x
 
 values can be removed via `.popleft()` and `.pop()`,
 
-::: {.small}
+::: {.columns .small}
+::: {.column}
 ```{python}
 x.popleft()
+```
+:::
+::: {.column}
+```{python}
 x.pop()
+```
+:::
+:::
+
+::: {.small}
+```{python}
 x
 ```
 :::
@@ -561,12 +585,13 @@ For each of the following scenarios, which is the most appropriate data structur
 
 * A fixed collection of 100 integers.
 
-* A stack (first in last out) of customer records.
-
 * A queue (first in first out) of customer records.
 
-* A count of word occurances within a document.
+* A stack (first in last out) of customer records.
 
+* A count of word occurrences within a document.
+
+* The heights of the bars in a histogram with even binwidths
 
 ## Data structures in R
 
