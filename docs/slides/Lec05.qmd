@@ -1,5 +1,5 @@
 ---
-title: "NumPy Basics"
+title: "NumPy"
 subtitle: "Lecture 05"
 author: "Dr. Colin Rundel"
 footer: "Sta 663 - Spring 2025"
@@ -38,6 +38,7 @@ local({
 
 ```{python}
 import numpy as np
+np.__version__
 ```
 
 ## Arrays
@@ -71,11 +72,11 @@ Note that NumPy stores data in row major order.
 
 * Arrays have a fixed size at creation
 
-* All data must be homogeneous (consistent type)
+* All data must be homogeneous (i.e. consistent type)
 
 * Built to support vectorized operations
 
-* Avoids copying whenever possible
+* Avoids copying whenever possible (inplace operations)
 
 
 ## dtype
@@ -116,6 +117,7 @@ np.array([-1, 1,2,1000]).astype(np.uint8)
 . . .
 
 ```{python}
+#| error: true
 np.array([-1, 1,2,1000], dtype = np.uint8)
 ```
 
@@ -232,9 +234,11 @@ x[1:, ::-1]
 
 ## Views and copies
 
-Basic subsetting of ndarray objects does not result in a new object, but instead a "view" of the original object. There are a couple of ways that we can investigate this behavior,
-
 ::: {.small}
+Basic subsetting of ndarray objects does not result in a new object, but instead a "view" of the original object. There are a couple of ways that we can investigate this behavior,
+:::
+
+::: {.xsmall}
 ```{python}
 x = np.arange(10)
 y = x[2:5]
@@ -242,17 +246,17 @@ z = x[2:5].copy()
 ```
 :::
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
-print("x =", x, ", x.base =", x.base)
-print("y =", y, ", y.base =", y.base)
-print("z =", z, ", z.base =", z.base)
+f"{x=}, {x.base=}"
+f"{y=}, {y.base=}"
+f"{z=}, {z.base=}"
 ```
 
 
 ```{python}
-type(x); type(y); type(z)
+type(x), type(y), type(z)
 ```
 :::
 
@@ -269,24 +273,30 @@ y.flags
 
 ## Subsetting with ...
 
+::: {.medium}
 Unlike R, it is not possible to leave an argument blank - to select all elements with numpy we use `:`. To avoid having to type excess `:` you can use `...` which expands to the number of `:` needed to account for all dimensions,
-
+:::
 
 :::: {.columns .small}
-::: {.column width='50%'}
+::: {.column width='40%'}
 ```{python}
-x = np.arange(16).reshape(2,2,2,2)
+x = (np.arange(16)
+     .reshape(2,2,2,2))
 x
+```
+:::
 
+::: {.column width='30%' .fragment}
+```{python}
+x[0, 1, :, :]
 x[0, 1, ...]
 ```
 :::
 
-::: {.column width='50%'}
+::: {.column width='30%'  .fragment}
 ```{python}
-x[..., 1]
-x[0, 1, :, :]
 x[:, :, :, 1]
+x[..., 1]
 ```
 :::
 ::::
@@ -297,7 +307,7 @@ x[:, :, :, 1]
 Unlike lists, an ndarray can be subset by a tuple containing integers,
 
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python error=TRUE}
 x = np.arange(6)
@@ -323,12 +333,12 @@ x[(0,1,3), (0,1,3)]
 
 
 ::: {.aside}
-More next time on why `x[(0,1,3)]` does not work.
+More on why `x[(0,1,3)]` does not work later.
 :::
 
 ## Subsetting assignment
 
-Most of the subsetting approaches we've just seen can also be used for assignment, just keep in mind that we cannot change the size or type of the ndarray,
+Most of the subsetting approaches we've just seen can also be used for assignment, just keep in mind that we cannot change the *size* or *type* of the `ndarray`,
 
 ::: {.small}
 ```{python}
@@ -396,12 +406,13 @@ np.shares_memory(x,z)
 
 When reshaping an array, the value `-1` can be used to automatically calculate a dimension,
 
+::: {.medium}
 ```{python}
-x = np.arange(6)
-x
+x = np.arange(6); x
 ```
+:::
 
-:::: {.columns}
+:::: {.columns .medium}
 ::: {.column width='50%'}
 ```{python error=TRUE}
 x.reshape((2,-1))
@@ -409,7 +420,7 @@ x.reshape((-1,3,2))
 ```
 :::
 
-::: {.column width='50%'}
+::: {.column width='50%' .fragment}
 ```{python error=TRUE}
 x.reshape(-1)
 x.reshape((-1,4))
@@ -422,34 +433,42 @@ x.reshape((-1,4))
 
 ## Flattening arrays
 
-We've just seen the most common approach to flattening an array (`reshape(-1)`), there are two additional methods / functions:
+We've just seen the most common approach to creating a flat *view* of an array (`reshape(-1)`), there are two additional methods / functions:
 
-* `ravel` which creates a flattened *view* of the array and
+* `ravel` which also creates a flattened *view* of the array and
 * `flatten` which creates a flattened *copy* of the array.
 
 ::: {.small}
 ```{python}
-x = np.arange(6).reshape((2,3))
-x
+w = np.arange(6).reshape((2,3)); w
 ```
 :::
 
 :::: {.columns .small}
-::: {.column width='50%'}
+::: {.column width='33%'}
 ```{python}
-y = x.ravel()
-y
+x = w.reshape(-1)
+x
 
-np.shares_memory(x,y)
+np.shares_memory(w,x)
 ```
 :::
 
-::: {.column width='50%'}
+::: {.column width='33%'}
 ```{python}
-z = x.flatten()
+y = w.ravel()
+y
+
+np.shares_memory(w,y)
+```
+:::
+
+::: {.column width='33%'}
+```{python}
+z = w.flatten()
 z
 
-np.shares_memory(x,z)
+np.shares_memory(w,z)
 ```
 :::
 ::::
@@ -459,7 +478,7 @@ np.shares_memory(x,z)
 
 The size of an array cannot be changed but a new array with a different size can be created from an existing array via the `resize` function and method. Note these have different behaviors around what values the new entries will have.
 
-:::: {.columns}
+:::: {.columns .small}
 ::: {.column width='50%'}
 ```{python}
 x = np.resize(
@@ -470,7 +489,7 @@ x
 ```
 :::
 
-::: {.column width='50%'}
+::: {.column width='50%' .fragment}
 ```{python}
 y = np.ones(
   (2,2)
@@ -481,6 +500,16 @@ y
 ```
 :::
 ::::
+
+::: {.fragment .small}
+```{python}
+y = np.ones(
+  (2,2)
+)
+y.resize((3,3))
+y
+```
+:::
 
 
 ## Joining arrays
@@ -616,7 +645,7 @@ y @ x
 
 All of the other common linear algebra functions are (mostly) implemented in the `linalg` submodule.
 
-::: {.medium}
+::: {.small}
 ```{python}
 np.linalg.det(y)
 
@@ -634,7 +663,7 @@ See [here](https://numpy.org/doc/stable/reference/routines.linalg.html) for more
 
 ## Random values
 
-NumPy has another submodule called `random` for functions used to generate random values,
+NumPy has another submodule called `random` for functions used to generate random values.
 
 In order to use this, you construct a generator via `default_rng()`, with or without a seed, and then use the generator's methods to obtain your desired random values.
 
@@ -652,3 +681,243 @@ rng.binomial(n=5, p=0.5, size = 10)
 
 
 ## Example - Linear regression with NumPy
+
+
+
+# Advanced Indexing
+
+## Advanced Indexing
+
+> Advanced indexing is triggered when the selection object, obj, is a non-tuple sequence object, an ndarray (of data type integer or bool), or a tuple with at least one sequence object or ndarray (of data type integer or bool).
+> 
+> * There are two types of advanced indexing: integer and Boolean.
+>
+> * Advanced indexing always returns a *copy* of the data (contrast with basic slicing that returns a view).
+
+
+::: {.aside}
+From NumPy - User Guide - [Advanced Indexing](https://numpy.org/doc/stable/user/basics.indexing.html#advanced-indexing)
+::: 
+
+
+## Integer array subsetting (lists)
+
+Lists of integers can be used to subset in the same way:
+
+::: {.xsmall}
+```{python error=TRUE}
+x = np.arange(16).reshape((4,4)); x
+```
+:::
+
+:::: {.columns .xsmall}
+::: {.column width='50%'}
+```{python error=TRUE}
+x[[1,3]]
+x[[1,3], ]
+x[:, [1,3]]
+```
+:::
+
+::: {.column width='50%'}
+```{python error=TRUE}
+x[[0,1,3],]
+x[[0,1,3]]
+x[[1.,3]]
+```
+:::
+::::
+
+
+## Integer array subsetting (ndarrays)
+
+Similarly we can also us integer ndarrays:
+
+:::: {.columns .small}
+::: {.column width='50%'}
+```{python error=TRUE}
+x = np.arange(6)
+y = np.array([0,1,3])
+z = np.array([1., 3.])
+```
+
+```{python error=TRUE}
+x[y,]
+x[y]
+
+x[z]
+```
+:::
+
+::: {.column width='50%' .fragment}
+```{python}
+x = np.arange(16).reshape((4,4))
+y = np.array([1,3])
+```
+
+```{python}
+x[y]
+x[y, ]
+x[:, y]
+x[y, y]
+```
+:::
+::::
+
+
+## Exercise 1
+
+Given the following matrix,
+
+```{python}
+x = np.arange(16).reshape((4,4))
+x
+```
+
+write an expression to obtain the center 2x2 values (i.e. 5, 6, 9, 10 as a matrix).
+
+## Boolean indexing
+
+Lists or ndarrays of boolean values can also be used to subset (positions with `True` are kept and `False` are discarded)
+
+::: {.small}
+```{python}
+x = np.arange(6); x
+```
+:::
+
+. . .
+
+::: {.small}
+```{python error=TRUE}
+x[[True, False, True, False, True, False]]
+x[[True]]
+```
+:::
+
+. . .
+
+::: {.small}
+```{python error=TRUE}
+x[np.array([True, False, True, False, True, False])]
+x[np.array([True])]
+```
+:::
+
+
+## Boolean  expressions
+
+The primary utility of boolean subsetting comes from vectorized comparison operations,
+
+::: {.small}
+```{python}
+x = np.arange(6); x
+```
+:::
+
+:::: {.columns .small}
+::: {.column width='50%'}
+```{python}
+x > 3
+x[x>3]
+
+x % 2 == 1
+x[x % 2 == 1]
+```
+:::
+
+::: {.column width='50%' .fragment}
+```{python}
+y = np.arange(9).reshape((3,3))
+y % 2 == 0
+y[y % 2 == 0]
+```
+:::
+::::
+
+
+## NumPy and Boolean operators
+
+If we want to use a logical operators on an array we need to use `&`, `|`, and `~` instead of `and`, `or`, and `not` respectively.
+
+::: {.medium}
+```{python}
+x = np.arange(6); x
+y = (x % 2 == 0); y
+```
+:::
+
+::: {.medium .fragment}
+```{python}
+~y
+```
+:::
+
+::: {.medium .fragment}
+```{python}
+y & (x > 3)
+```
+:::
+
+::: {.medium .fragment}
+```{python}
+y | (x > 3)
+```
+:::
+
+
+## meshgrid()
+
+One other useful function in NumPy is `meshgrid()` which generates all possible combinations between the input vectors (as a tuple of ndarrays),
+
+::: {.small}
+```{python}
+pts = np.arange(3)
+x, y = np.meshgrid(pts, pts)
+```
+:::
+
+. . .
+
+:::: {.columns .small}
+::: {.column width='50%'}
+```{python}
+x
+y
+```
+:::
+
+::: {.column width='50%' .fragment}
+```{python}
+np.sqrt(x**2 + y**2).round(3)
+```
+:::
+::::
+
+
+## Exercise 2
+
+::: {.small}
+We will now use this to attempt a simple brute force approach to numerical optimization, define a grid of points using `meshgrid()` to approximate the minima the following function:
+
+$$
+f(x,y) = (1-x)^2 + 100(y-x^2)^2
+$$ 
+Considering values of $x,y \in (-1,3)$, which value(s) of $x,y$ minimize this function?
+:::
+
+```{r echo=FALSE, message=FALSE, out.width="60%", fig.align="center"}
+library(tidyverse)
+expand.grid(
+    x = seq(-1,3, length.out = 1000),
+    y = seq(-1,3, length.out = 1000)
+) %>%
+    mutate(
+        f = (1-x)^2 + 100*(y-x^2)^2
+    ) %>%
+    ggplot(aes(x=x,y=y,fill=log(f))) +
+        geom_raster() +
+        theme_minimal() +
+        labs(title = "Rosenbrock function (a=1, b=100)") +
+        coord_fixed()
+```
