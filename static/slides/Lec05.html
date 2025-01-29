@@ -1135,8 +1135,8 @@ Dr. Colin Rundel
 </section>
 <section id="dtype" class="slide level2">
 <h2>dtype</h2>
-<p>NumPy arrays will have a specific type used for storing their data, called their <code>dtype</code>. This is accessible via the <code>.dtype</code> attribute and can be set at creation using the <code>dtype</code> argument.</p>
-<div class="columns small">
+<p>NumPy arrays all have the <code>type()</code> <code>numpy.ndarray</code> - specific type stored in the arrray is recorded as the array’s <code>dtype</code>. This is accessible via the <code>.dtype</code> attribute and can be set at creation using the <code>dtype</code> argument.</p>
+<div class="columns xsmall">
 <div class="column" style="width:50%;">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href></a>np.array([<span class="dv">1</span>,<span class="dv">1</span>]).dtype</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1174,59 +1174,66 @@ Dr. Colin Rundel
 </div></aside></section>
 <section id="dtypes-and-overflow" class="slide level2">
 <h2>dtypes and overflow</h2>
+<p>Some types have a maximum and or minimum value that can be stored in them. If you try to create an array with a value outside of this range you will get an overflow error. If you are instead coercing values using <code>astype()</code> you will <em>not</em> get this error.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href></a>np.array([<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1000</span>]).astype(np.uint8)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href></a>np.array([<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>,<span class="dv">2</span>], dtype <span class="op">=</span> np.uint8)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>array([255,   1,   2, 232], dtype=uint8)</code></pre>
+<pre><code>OverflowError: Python integer -1 out of bounds for uint8</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href></a>np.array([<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1000</span>], dtype <span class="op">=</span> np.uint8)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>OverflowError: Python integer 1000 out of bounds for uint8</code></pre>
 </div>
 </div>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href></a>np.array([<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1000</span>], dtype <span class="op">=</span> np.uint8)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href></a>np.array([<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1000</span>]).astype(np.uint8)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>OverflowError: Python integer -1 out of bounds for uint8</code></pre>
+<pre><code>array([255,   1,   2, 232], dtype=uint8)</code></pre>
 </div>
 </div>
 </div>
 </section>
 <section id="creating-1d-arrays" class="slide level2">
 <h2>Creating 1d arrays</h2>
-<p>Some common tools for creating useful 1d arrays:</p>
+<p>Some common functions and methods for creating useful 1d arrays:</p>
 <div class="columns small">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href></a>np.arange(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href></a>np.arange(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href></a>np.arange(<span class="dv">3</span>, <span class="dv">5</span>, <span class="fl">0.25</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href></a>np.arange(<span class="dv">3</span>, <span class="dv">5</span>, <span class="fl">0.25</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([3.  , 3.25, 3.5 , 3.75, 4.  , 4.25, 4.5 , 4.75])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href></a>np.linspace(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">11</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href></a>np.linspace(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">11</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0. , 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1. ])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href></a>np.logspace(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href></a>np.logspace(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([  1.        ,   4.64158883,  21.5443469 , 100.        ])</code></pre>
 </div>
 </div>
 </div><div class="column fragment" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href></a>np.ones(<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href></a>np.ones(<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([1., 1., 1., 1.])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href></a>np.zeros(<span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href></a>np.zeros(<span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0., 0., 0., 0., 0., 0.])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href></a>np.full(<span class="dv">3</span>, <span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href></a>np.full(<span class="dv">3</span>, <span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([False, False, False])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href></a>np.empty(<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href></a>np.empty(<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([1., 1., 1., 1.])</code></pre>
 </div>
@@ -1242,18 +1249,18 @@ Dr. Colin Rundel
 <div class="columns small">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href></a>np.eye(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href></a>np.eye(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[1., 0., 0.],
        [0., 1., 0.],
        [0., 0., 1.]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href></a>np.identity(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href></a>np.identity(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[1., 0.],
        [0., 1.]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href></a>np.zeros((<span class="dv">2</span>,<span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href></a>np.zeros((<span class="dv">2</span>,<span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[0., 0.],
        [0., 0.]])</code></pre>
@@ -1261,19 +1268,19 @@ Dr. Colin Rundel
 </div>
 </div><div class="column fragment" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href></a>np.diag([<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href></a>np.diag([<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[3, 0, 0],
        [0, 2, 0],
        [0, 0, 1]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href></a>np.tri(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href></a>np.tri(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[1., 0., 0.],
        [1., 1., 0.],
        [1., 1., 1.]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href></a>np.triu(np.full((<span class="dv">3</span>,<span class="dv">3</span>),<span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href></a>np.triu(np.full((<span class="dv">3</span>,<span class="dv">3</span>),<span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[3, 3, 3],
        [0, 3, 3],
@@ -1286,12 +1293,12 @@ Dr. Colin Rundel
 <p>The NumPy documentation references a <code>matrix</code> class and related functions - this is no longer recommended, use the <code>ndarray</code> class instead.</p>
 </div></aside></section>
 <section id="creating-nd-arrays" class="slide level2">
-<h2>Creating nd arrays</h2>
+<h2>Creating <span class="math inline">\(n\)</span>d arrays</h2>
 <p>For higher dimensional arrays just add dimensions when constructing,</p>
 <div class="columns small">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href></a>np.zeros((<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href></a>np.zeros((<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[[0., 0.],
         [0., 0.],
@@ -1304,7 +1311,7 @@ Dr. Colin Rundel
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href></a>np.ones((<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href></a>np.ones((<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[[[1., 1.],
          [1., 1.]],
@@ -1332,8 +1339,8 @@ Dr. Colin Rundel
 <p>Arrays are subsetted using the standard python syntax with either indexes or slices, dimensions are separated by commas.</p>
 <div class="small">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href></a>x <span class="op">=</span> np.array([[<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>],[<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>],[<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>]])</span>
-<span id="cb63-2"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href></a>x <span class="op">=</span> np.array([[<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>],[<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>],[<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>]])</span>
+<span id="cb65-2"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[1, 2, 3],
        [4, 5, 6],
@@ -1345,19 +1352,19 @@ Dr. Colin Rundel
 <div class="columns small">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href></a>x[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href></a>x[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([1, 2, 3])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href></a>x[<span class="dv">0</span>,<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href></a>x[<span class="dv">0</span>,<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>np.int64(1)</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href></a>x[<span class="dv">0</span>][<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href></a>x[<span class="dv">0</span>][<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>np.int64(1)</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href></a>x[<span class="dv">0</span>:<span class="dv">3</span>:<span class="dv">2</span>, :]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href></a>x[<span class="dv">0</span>:<span class="dv">3</span>:<span class="dv">2</span>, :]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[1, 2, 3],
        [7, 8, 9]])</code></pre>
@@ -1365,17 +1372,17 @@ Dr. Colin Rundel
 </div>
 </div><div class="column fragment" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href></a>x[<span class="dv">0</span>:<span class="dv">3</span>:<span class="dv">2</span>, :]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href></a>x[<span class="dv">0</span>:<span class="dv">3</span>:<span class="dv">2</span>, :]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[1, 2, 3],
        [7, 8, 9]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href></a>x[<span class="dv">0</span>:<span class="dv">3</span>:<span class="dv">2</span>, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href></a>x[<span class="dv">0</span>:<span class="dv">3</span>:<span class="dv">2</span>, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[1, 2, 3],
        [7, 8, 9]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href></a>x[<span class="dv">1</span>:, ::<span class="op">-</span><span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb79-1"><a href></a>x[<span class="dv">1</span>:, ::<span class="op">-</span><span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[6, 5, 4],
        [9, 8, 7]])</code></pre>
@@ -1391,48 +1398,48 @@ Dr. Colin Rundel
 </div>
 <div class="xsmall">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb79-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">10</span>)</span>
-<span id="cb79-2"><a href></a>y <span class="op">=</span> x[<span class="dv">2</span>:<span class="dv">5</span>]</span>
-<span id="cb79-3"><a href></a>z <span class="op">=</span> x[<span class="dv">2</span>:<span class="dv">5</span>].copy()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb81-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">10</span>)</span>
+<span id="cb81-2"><a href></a>y <span class="op">=</span> x[<span class="dv">2</span>:<span class="dv">5</span>]</span>
+<span id="cb81-3"><a href></a>z <span class="op">=</span> x[<span class="dv">2</span>:<span class="dv">5</span>].copy()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div class="columns xsmall">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb80-1"><a href></a><span class="ss">f&quot;</span><span class="sc">{</span>x<span class="op">=</span><span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>x<span class="sc">.</span>base<span class="op">=</span><span class="sc">}</span><span class="ss">&quot;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb82-1"><a href></a><span class="ss">f&quot;</span><span class="sc">{</span>x<span class="op">=</span><span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>x<span class="sc">.</span>base<span class="op">=</span><span class="sc">}</span><span class="ss">&quot;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&#39;x=array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), x.base=None&#39;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb82-1"><a href></a><span class="ss">f&quot;</span><span class="sc">{</span>y<span class="op">=</span><span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>y<span class="sc">.</span>base<span class="op">=</span><span class="sc">}</span><span class="ss">&quot;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb84-1"><a href></a><span class="ss">f&quot;</span><span class="sc">{</span>y<span class="op">=</span><span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>y<span class="sc">.</span>base<span class="op">=</span><span class="sc">}</span><span class="ss">&quot;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&#39;y=array([2, 3, 4]), y.base=array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])&#39;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb84-1"><a href></a><span class="ss">f&quot;</span><span class="sc">{</span>z<span class="op">=</span><span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>z<span class="sc">.</span>base<span class="op">=</span><span class="sc">}</span><span class="ss">&quot;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb86-1"><a href></a><span class="ss">f&quot;</span><span class="sc">{</span>z<span class="op">=</span><span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>z<span class="sc">.</span>base<span class="op">=</span><span class="sc">}</span><span class="ss">&quot;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&#39;z=array([2, 3, 4]), z.base=None&#39;</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb86-1"><a href></a><span class="bu">type</span>(x), <span class="bu">type</span>(y), <span class="bu">type</span>(z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb88-1"><a href></a><span class="bu">type</span>(x), <span class="bu">type</span>(y), <span class="bu">type</span>(z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>(&lt;class &#39;numpy.ndarray&#39;&gt;, &lt;class &#39;numpy.ndarray&#39;&gt;, &lt;class &#39;numpy.ndarray&#39;&gt;)</code></pre>
 </div>
 </div>
 </div><div class="column fragment" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb88-1"><a href></a>np.shares_memory(x,y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb90-1"><a href></a>np.shares_memory(x,y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>True</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb90-1"><a href></a>np.shares_memory(x,z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb92-1"><a href></a>np.shares_memory(x,z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>False</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb92-1"><a href></a>np.shares_memory(y,z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb94-1"><a href></a>np.shares_memory(y,z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>False</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb94-1"><a href></a>y.flags</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb96-1"><a href></a>y.flags</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  C_CONTIGUOUS : True
   F_CONTIGUOUS : True
@@ -1452,9 +1459,9 @@ Dr. Colin Rundel
 <div class="columns small">
 <div class="column" style="width:40%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb96-1"><a href></a>x <span class="op">=</span> (np.arange(<span class="dv">16</span>)</span>
-<span id="cb96-2"><a href></a>     .reshape(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))</span>
-<span id="cb96-3"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb98-1"><a href></a>x <span class="op">=</span> (np.arange(<span class="dv">16</span>)</span>
+<span id="cb98-2"><a href></a>     .reshape(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb98-3"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[[[ 0,  1],
          [ 2,  3]],
@@ -1471,12 +1478,12 @@ Dr. Colin Rundel
 </div>
 </div><div class="column fragment" style="width:30%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb98-1"><a href></a>x[<span class="dv">0</span>, <span class="dv">1</span>, :, :]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb100-1"><a href></a>x[<span class="dv">0</span>, <span class="dv">1</span>, :, :]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[4, 5],
        [6, 7]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb100-1"><a href></a>x[<span class="dv">0</span>, <span class="dv">1</span>, ...]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb102-1"><a href></a>x[<span class="dv">0</span>, <span class="dv">1</span>, ...]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[4, 5],
        [6, 7]])</code></pre>
@@ -1484,7 +1491,7 @@ Dr. Colin Rundel
 </div>
 </div><div class="column fragment" style="width:30%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb102-1"><a href></a>x[:, :, :, <span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb104-1"><a href></a>x[:, :, :, <span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[[ 1,  3],
         [ 5,  7]],
@@ -1492,7 +1499,7 @@ Dr. Colin Rundel
        [[ 9, 11],
         [13, 15]]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb104-1"><a href></a>x[..., <span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb106-1"><a href></a>x[..., <span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[[ 1,  3],
         [ 5,  7]],
@@ -1509,48 +1516,47 @@ Dr. Colin Rundel
 <div class="columns xsmall">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb106-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)</span>
-<span id="cb106-2"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb108-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 2, 3, 4, 5])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb108-1"><a href></a>x[(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>),]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb110-1"><a href></a>x[(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>),]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 3])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb110-1"><a href></a>x[(<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">1</span>,<span class="dv">0</span>),]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb112-1"><a href></a>x[(<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">1</span>,<span class="dv">0</span>),]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([3, 5, 1, 0])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb112-1"><a href></a>x[(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb114"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb114-1"><a href></a>x[(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>IndexError: too many indices for array: array is 1-dimensional, but 3 were indexed</code></pre>
 </div>
 </div>
 </div><div class="column fragment" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb114"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb114-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">16</span>).reshape((<span class="dv">4</span>,<span class="dv">4</span>))</span>
-<span id="cb114-2"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb116-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">16</span>).reshape((<span class="dv">4</span>,<span class="dv">4</span>))</span>
+<span id="cb116-2"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ 0,  1,  2,  3],
        [ 4,  5,  6,  7],
        [ 8,  9, 10, 11],
        [12, 13, 14, 15]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb116-1"><a href></a>x[(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>), :]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb118-1"><a href></a>x[(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>), :]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ 0,  1,  2,  3],
        [ 4,  5,  6,  7],
        [12, 13, 14, 15]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb118-1"><a href></a>x[:, (<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb120"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb120-1"><a href></a>x[:, (<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ 0,  1,  3],
        [ 4,  5,  7],
        [ 8,  9, 11],
        [12, 13, 15]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb120"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb120-1"><a href></a>x[(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>), (<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb122-1"><a href></a>x[(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>), (<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([ 0,  5, 15])</code></pre>
 </div>
@@ -1565,7 +1571,7 @@ Dr. Colin Rundel
 <p>Most of the subsetting approaches we’ve just seen can also be used for assignment, just keep in mind that we cannot change the <em>size</em> or <em>type</em> of the <code>ndarray</code>,</p>
 <div class="small">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb122-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">9</span>).reshape((<span class="dv">3</span>,<span class="dv">3</span>))<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb124-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">9</span>).reshape((<span class="dv">3</span>,<span class="dv">3</span>))<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[0, 1, 2],
        [3, 4, 5],
@@ -1577,15 +1583,13 @@ Dr. Colin Rundel
 <div class="columns small">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb124-1"><a href></a>x[<span class="dv">0</span>,<span class="dv">0</span>] <span class="op">=</span> <span class="op">-</span><span class="dv">1</span></span>
-<span id="cb124-2"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb126-1"><a href></a>x[<span class="dv">0</span>,<span class="dv">0</span>] <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[-1,  1,  2],
        [ 3,  4,  5],
        [ 6,  7,  8]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb126-1"><a href></a>x[<span class="dv">0</span>, :] <span class="op">=</span> <span class="op">-</span><span class="dv">2</span></span>
-<span id="cb126-2"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb128-1"><a href></a>x[<span class="dv">0</span>, :] <span class="op">=</span> <span class="op">-</span><span class="dv">2</span><span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[-2, -2, -2],
        [ 3,  4,  5],
@@ -1594,15 +1598,13 @@ Dr. Colin Rundel
 </div>
 </div><div class="column fragment" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb128-1"><a href></a>x[<span class="dv">0</span>:<span class="dv">2</span>,<span class="dv">1</span>:<span class="dv">3</span>] <span class="op">=</span> <span class="op">-</span><span class="dv">3</span></span>
-<span id="cb128-2"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb130"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb130-1"><a href></a>x[<span class="dv">0</span>:<span class="dv">2</span>,<span class="dv">1</span>:<span class="dv">3</span>] <span class="op">=</span> <span class="op">-</span><span class="dv">3</span><span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[-2, -3, -3],
        [ 3, -3, -3],
        [ 6,  7,  8]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb130"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb130-1"><a href></a>x[(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>), (<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>)] <span class="op">=</span> <span class="op">-</span><span class="dv">4</span></span>
-<span id="cb130-2"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb132"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb132-1"><a href></a>x[(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>), (<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>)] <span class="op">=</span> <span class="op">-</span><span class="dv">4</span><span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[-4, -3, -3],
        [ 3, -4, -3],
@@ -1611,14 +1613,23 @@ Dr. Colin Rundel
 </div>
 </div></div>
 </div>
+<div class="fragment">
+<div class="small">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb134"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb134-1"><a href></a>x [<span class="dv">0</span>,<span class="dv">0</span>] <span class="op">=</span> <span class="st">&quot;A&quot;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ValueError: invalid literal for int() with base 10: &#39;A&#39;</code></pre>
+</div>
+</div>
+</div>
+</div>
 </section>
 <section id="reshaping-arrays" class="slide level2">
 <h2>Reshaping arrays</h2>
 <p>The dimensions of an array can be retrieved via the <code>shape</code> attribute, these values can changed via the <code>reshape()</code> method or updating <code>shape</code></p>
 <div class="small">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb132"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb132-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)</span>
-<span id="cb132-2"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb136"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb136-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 2, 3, 4, 5])</code></pre>
 </div>
@@ -1627,32 +1638,31 @@ Dr. Colin Rundel
 <div class="columns small">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb134"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb134-1"><a href></a>y <span class="op">=</span> x.reshape((<span class="dv">2</span>,<span class="dv">3</span>))</span>
-<span id="cb134-2"><a href></a>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb138"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb138-1"><a href></a>y <span class="op">=</span> x.reshape((<span class="dv">2</span>,<span class="dv">3</span>))<span class="op">;</span> y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[0, 1, 2],
        [3, 4, 5]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb136"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb136-1"><a href></a>np.shares_memory(x,y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb140"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb140-1"><a href></a>np.shares_memory(x,y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>True</code></pre>
 </div>
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb138"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb138-1"><a href></a>z <span class="op">=</span> x</span>
-<span id="cb138-2"><a href></a>z.shape <span class="op">=</span> (<span class="dv">2</span>,<span class="dv">3</span>)</span>
-<span id="cb138-3"><a href></a>z</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb142"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb142-1"><a href></a>z <span class="op">=</span> x</span>
+<span id="cb142-2"><a href></a>z.shape <span class="op">=</span> (<span class="dv">2</span>,<span class="dv">3</span>)</span>
+<span id="cb142-3"><a href></a>z</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[0, 1, 2],
        [3, 4, 5]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb140"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb140-1"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb144"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb144-1"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[0, 1, 2],
        [3, 4, 5]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb142"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb142-1"><a href></a>np.shares_memory(x,z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb146"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb146-1"><a href></a>np.shares_memory(x,z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>True</code></pre>
 </div>
@@ -1664,7 +1674,7 @@ Dr. Colin Rundel
 <p>When reshaping an array, the value <code>-1</code> can be used to automatically calculate a dimension,</p>
 <div class="medium">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb144"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb144-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb148"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb148-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 2, 3, 4, 5])</code></pre>
 </div>
@@ -1673,12 +1683,12 @@ Dr. Colin Rundel
 <div class="columns medium">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb146"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb146-1"><a href></a>x.reshape((<span class="dv">2</span>,<span class="op">-</span><span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb150"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb150-1"><a href></a>x.reshape((<span class="dv">2</span>,<span class="op">-</span><span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[0, 1, 2],
        [3, 4, 5]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb148"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb148-1"><a href></a>x.reshape((<span class="op">-</span><span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb152"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb152-1"><a href></a>x.reshape((<span class="op">-</span><span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[[0, 1],
         [2, 3],
@@ -1687,11 +1697,11 @@ Dr. Colin Rundel
 </div>
 </div><div class="column fragment" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb150"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb150-1"><a href></a>x.reshape(<span class="op">-</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb154"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb154-1"><a href></a>x.reshape(<span class="op">-</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 2, 3, 4, 5])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb152"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb152-1"><a href></a>x.reshape((<span class="op">-</span><span class="dv">1</span>,<span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb156"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb156-1"><a href></a>x.reshape((<span class="op">-</span><span class="dv">1</span>,<span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>ValueError: cannot reshape array of size 6 into shape (4)</code></pre>
 </div>
@@ -1700,14 +1710,14 @@ Dr. Colin Rundel
 </section>
 <section id="flattening-arrays" class="slide level2">
 <h2>Flattening arrays</h2>
-<p>We’ve just seen the most common approach to creating a flat <em>view</em> of an array (<code>reshape(-1)</code>), there are two additional methods / functions:</p>
+<p>We just saw one of the more common approaches to creating a flat <em>view</em> of an array (<code>reshape(-1)</code>), there are two other common methods / functions:</p>
 <ul>
-<li><code>ravel</code> which also creates a flattened <em>view</em> of the array and</li>
-<li><code>flatten</code> which creates a flattened <em>copy</em> of the array.</li>
+<li><code>ravel</code> creates a flattened <em>view</em> of the array and</li>
+<li><code>flatten</code> creates a flattened <em>copy</em> of the array.</li>
 </ul>
 <div class="small">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb154"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb154-1"><a href></a>w <span class="op">=</span> np.arange(<span class="dv">6</span>).reshape((<span class="dv">2</span>,<span class="dv">3</span>))<span class="op">;</span> w</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb158"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb158-1"><a href></a>w <span class="op">=</span> np.arange(<span class="dv">6</span>).reshape((<span class="dv">2</span>,<span class="dv">3</span>))<span class="op">;</span> w</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[0, 1, 2],
        [3, 4, 5]])</code></pre>
@@ -1717,36 +1727,36 @@ Dr. Colin Rundel
 <div class="columns small">
 <div class="column" style="width:33%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb156"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb156-1"><a href></a>x <span class="op">=</span> w.reshape(<span class="op">-</span><span class="dv">1</span>)</span>
-<span id="cb156-2"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb160"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb160-1"><a href></a>x <span class="op">=</span> w.reshape(<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb160-2"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 2, 3, 4, 5])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb158"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb158-1"><a href></a>np.shares_memory(w,x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb162"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb162-1"><a href></a>np.shares_memory(w,x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>True</code></pre>
 </div>
 </div>
 </div><div class="column" style="width:33%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb160"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb160-1"><a href></a>y <span class="op">=</span> w.ravel()</span>
-<span id="cb160-2"><a href></a>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb164"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb164-1"><a href></a>y <span class="op">=</span> w.ravel()</span>
+<span id="cb164-2"><a href></a>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 2, 3, 4, 5])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb162"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb162-1"><a href></a>np.shares_memory(w,y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb166"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb166-1"><a href></a>np.shares_memory(w,y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>True</code></pre>
 </div>
 </div>
 </div><div class="column" style="width:33%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb164"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb164-1"><a href></a>z <span class="op">=</span> w.flatten()</span>
-<span id="cb164-2"><a href></a>z</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb168"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb168-1"><a href></a>z <span class="op">=</span> w.flatten()</span>
+<span id="cb168-2"><a href></a>z</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 2, 3, 4, 5])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb166"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb166-1"><a href></a>np.shares_memory(w,z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb170"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb170-1"><a href></a>np.shares_memory(w,z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>False</code></pre>
 </div>
@@ -1759,11 +1769,11 @@ Dr. Colin Rundel
 <div class="columns small">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb168"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb168-1"><a href></a>x <span class="op">=</span> np.resize(</span>
-<span id="cb168-2"><a href></a>  np.ones((<span class="dv">2</span>,<span class="dv">2</span>)), </span>
-<span id="cb168-3"><a href></a>  (<span class="dv">3</span>,<span class="dv">3</span>)</span>
-<span id="cb168-4"><a href></a>)</span>
-<span id="cb168-5"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb172"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb172-1"><a href></a>x <span class="op">=</span> np.resize(</span>
+<span id="cb172-2"><a href></a>  np.ones((<span class="dv">2</span>,<span class="dv">2</span>)), </span>
+<span id="cb172-3"><a href></a>  (<span class="dv">3</span>,<span class="dv">3</span>)</span>
+<span id="cb172-4"><a href></a>)</span>
+<span id="cb172-5"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[1., 1., 1.],
        [1., 1., 1.],
@@ -1772,21 +1782,22 @@ Dr. Colin Rundel
 </div>
 </div><div class="column fragment" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb170"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb170-1"><a href></a>y <span class="op">=</span> np.ones(</span>
-<span id="cb170-2"><a href></a>  (<span class="dv">2</span>,<span class="dv">2</span>)</span>
-<span id="cb170-3"><a href></a>).resize(</span>
-<span id="cb170-4"><a href></a>  (<span class="dv">3</span>,<span class="dv">3</span>)</span>
-<span id="cb170-5"><a href></a>)</span>
-<span id="cb170-6"><a href></a>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb174"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb174-1"><a href></a>y <span class="op">=</span> np.ones(</span>
+<span id="cb174-2"><a href></a>  (<span class="dv">2</span>,<span class="dv">2</span>)</span>
+<span id="cb174-3"><a href></a>).resize(</span>
+<span id="cb174-4"><a href></a>  (<span class="dv">3</span>,<span class="dv">3</span>)</span>
+<span id="cb174-5"><a href></a>)</span>
+<span id="cb174-6"><a href></a>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Why didn’t this work?</p>
 </div></div>
 <div class="fragment small">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb171"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb171-1"><a href></a>y <span class="op">=</span> np.ones(</span>
-<span id="cb171-2"><a href></a>  (<span class="dv">2</span>,<span class="dv">2</span>)</span>
-<span id="cb171-3"><a href></a>)</span>
-<span id="cb171-4"><a href></a>y.resize((<span class="dv">3</span>,<span class="dv">3</span>))</span>
-<span id="cb171-5"><a href></a>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb175"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb175-1"><a href></a>y <span class="op">=</span> np.ones(</span>
+<span id="cb175-2"><a href></a>  (<span class="dv">2</span>,<span class="dv">2</span>)</span>
+<span id="cb175-3"><a href></a>)</span>
+<span id="cb175-4"><a href></a>y.resize((<span class="dv">3</span>,<span class="dv">3</span>))</span>
+<span id="cb175-5"><a href></a>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[1., 1., 1.],
        [1., 0., 0.],
@@ -1801,7 +1812,7 @@ Dr. Colin Rundel
 <div class="columns small">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb173"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb173-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">4</span>).reshape((<span class="dv">2</span>,<span class="dv">2</span>))<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb177"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb177-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">4</span>).reshape((<span class="dv">2</span>,<span class="dv">2</span>))<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[0, 1],
        [2, 3]])</code></pre>
@@ -1809,7 +1820,7 @@ Dr. Colin Rundel
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb175"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb175-1"><a href></a>y <span class="op">=</span> np.arange(<span class="dv">4</span>,<span class="dv">8</span>).reshape((<span class="dv">2</span>,<span class="dv">2</span>))<span class="op">;</span> y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb179"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb179-1"><a href></a>y <span class="op">=</span> np.arange(<span class="dv">4</span>,<span class="dv">8</span>).reshape((<span class="dv">2</span>,<span class="dv">2</span>))<span class="op">;</span> y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[4, 5],
        [6, 7]])</code></pre>
@@ -1819,14 +1830,14 @@ Dr. Colin Rundel
 <div class="columns small">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb177"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb177-1"><a href></a>np.concatenate((x,y), axis<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb181"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb181-1"><a href></a>np.concatenate((x,y), axis<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[0, 1],
        [2, 3],
        [4, 5],
        [6, 7]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb179"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb179-1"><a href></a>np.concatenate((x,y), axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb183"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb183-1"><a href></a>np.concatenate((x,y), axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[0, 1, 4, 5],
        [2, 3, 6, 7]])</code></pre>
@@ -1834,14 +1845,14 @@ Dr. Colin Rundel
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb181"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb181-1"><a href></a>np.vstack((x,y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb185"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb185-1"><a href></a>np.vstack((x,y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[0, 1],
        [2, 3],
        [4, 5],
        [6, 7]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb183"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb183-1"><a href></a>np.hstack((x,y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb187"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb187-1"><a href></a>np.hstack((x,y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[0, 1, 4, 5],
        [2, 3, 6, 7]])</code></pre>
@@ -1854,18 +1865,18 @@ Dr. Colin Rundel
 <div class="columns small">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb185"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb185-1"><a href></a>np.concatenate((x,y), axis<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb189"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb189-1"><a href></a>np.concatenate((x,y), axis<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>numpy.exceptions.AxisError: axis 2 is out of bounds for array of dimension 2</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb187"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb187-1"><a href></a>np.concatenate((x,y), axis<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb191"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb191-1"><a href></a>np.concatenate((x,y), axis<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 2, 3, 4, 5, 6, 7])</code></pre>
 </div>
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb189"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb189-1"><a href></a>np.dstack((x,y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb193"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb193-1"><a href></a>np.dstack((x,y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[[0, 4],
         [1, 5]],
@@ -1887,30 +1898,30 @@ Dr. Colin Rundel
 <div class="columns small">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb191"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb191-1"><a href></a>np.arange(<span class="dv">3</span>) <span class="op">+</span> np.arange(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb195"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb195-1"><a href></a>np.arange(<span class="dv">3</span>) <span class="op">+</span> np.arange(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 2, 4])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb193"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb193-1"><a href></a>np.arange(<span class="dv">3</span>) <span class="op">-</span> np.arange(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb197"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb197-1"><a href></a>np.arange(<span class="dv">3</span>) <span class="op">-</span> np.arange(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 0, 0])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb195"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb195-1"><a href></a>np.arange(<span class="dv">3</span>) <span class="op">+</span> <span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb199"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb199-1"><a href></a>np.arange(<span class="dv">3</span>) <span class="op">+</span> <span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([2, 3, 4])</code></pre>
 </div>
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb197"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb197-1"><a href></a>np.arange(<span class="dv">3</span>) <span class="op">*</span> np.arange(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb201"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb201-1"><a href></a>np.arange(<span class="dv">3</span>) <span class="op">*</span> np.arange(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 4])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb199"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb199-1"><a href></a>np.arange(<span class="dv">1</span>,<span class="dv">4</span>) <span class="op">/</span> np.arange(<span class="dv">1</span>,<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb203"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb203-1"><a href></a>np.arange(<span class="dv">1</span>,<span class="dv">4</span>) <span class="op">/</span> np.arange(<span class="dv">1</span>,<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([1., 1., 1.])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb201"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb201-1"><a href></a>np.arange(<span class="dv">3</span>) <span class="op">*</span> <span class="dv">3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb205"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb205-1"><a href></a>np.arange(<span class="dv">3</span>) <span class="op">*</span> <span class="dv">3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 3, 6])</code></pre>
 </div>
@@ -1919,12 +1930,12 @@ Dr. Colin Rundel
 <div class="fragment">
 <div class="small">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb203"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb203-1"><a href></a>np.full((<span class="dv">2</span>,<span class="dv">2</span>), <span class="dv">2</span>) <span class="op">**</span> np.arange(<span class="dv">4</span>).reshape((<span class="dv">2</span>,<span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb207"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb207-1"><a href></a>np.full((<span class="dv">2</span>,<span class="dv">2</span>), <span class="dv">2</span>) <span class="op">**</span> np.arange(<span class="dv">4</span>).reshape((<span class="dv">2</span>,<span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[1, 2],
        [4, 8]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb205"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb205-1"><a href></a>np.full((<span class="dv">2</span>,<span class="dv">2</span>), <span class="dv">2</span>) <span class="op">**</span> np.arange(<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb209"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb209-1"><a href></a>np.full((<span class="dv">2</span>,<span class="dv">2</span>), <span class="dv">2</span>) <span class="op">**</span> np.arange(<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>ValueError: operands could not be broadcast together with shapes (2,2) (4,) </code></pre>
 </div>
@@ -1939,19 +1950,19 @@ Dr. Colin Rundel
 <h2>Mathematical functions</h2>
 <p>NumPy provides a <a href="https://numpy.org/doc/stable/reference/routines.math.html">wide variety</a> of basic mathematical functions that are vectorized, in general they will be faster than their base equivalents (e.g. <code>np.sum()</code> vs <code>sum()</code>),</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb207"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb207-1"><a href></a>np.<span class="bu">sum</span>(np.arange(<span class="dv">1000</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb211"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb211-1"><a href></a>np.<span class="bu">sum</span>(np.arange(<span class="dv">1000</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>np.int64(499500)</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb209"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb209-1"><a href></a>np.cumsum(np.arange(<span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb213"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb213-1"><a href></a>np.cumsum(np.arange(<span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([ 0,  1,  3,  6, 10, 15, 21, 28, 36, 45])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb211"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb211-1"><a href></a>np.log10(np.arange(<span class="dv">1</span>,<span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb215"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb215-1"><a href></a>np.log10(np.arange(<span class="dv">1</span>,<span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0.        , 0.30103   , 0.47712125])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb213"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb213-1"><a href></a>np.median(np.arange(<span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb217"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb217-1"><a href></a>np.median(np.arange(<span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>np.float64(4.5)</code></pre>
 </div>
@@ -1961,19 +1972,19 @@ Dr. Colin Rundel
 <h2>Matrix multiplication</h2>
 <p>is supported using the <code>matmul()</code> function or the <code>@</code> operator,</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb215"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb215-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>).reshape(<span class="dv">3</span>,<span class="dv">2</span>)</span>
-<span id="cb215-2"><a href></a>y <span class="op">=</span> np.tri(<span class="dv">2</span>,<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb219"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb219-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>).reshape(<span class="dv">3</span>,<span class="dv">2</span>)</span>
+<span id="cb219-2"><a href></a>y <span class="op">=</span> np.tri(<span class="dv">2</span>,<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="columns">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb216"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb216-1"><a href></a>x <span class="op">@</span> y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb220"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb220-1"><a href></a>x <span class="op">@</span> y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[1., 1.],
        [5., 3.],
        [9., 5.]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb218"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb218-1"><a href></a>y.T <span class="op">@</span> y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb222"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb222-1"><a href></a>y.T <span class="op">@</span> y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[2., 1.],
        [1., 1.]])</code></pre>
@@ -1981,12 +1992,12 @@ Dr. Colin Rundel
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb220"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb220-1"><a href></a>np.matmul(x.T, x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb224"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb224-1"><a href></a>np.matmul(x.T, x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[20, 26],
        [26, 35]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb222"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb222-1"><a href></a>y <span class="op">@</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb226"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb226-1"><a href></a>y <span class="op">@</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>ValueError: matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)-&gt;(n?,m?) (size 3 is different from 2)</code></pre>
 </div>
@@ -1998,21 +2009,21 @@ Dr. Colin Rundel
 <p>All of the other common linear algebra functions are (mostly) implemented in the <code>linalg</code> submodule.</p>
 <div class="small">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb224"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb224-1"><a href></a>np.linalg.det(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb228"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb228-1"><a href></a>np.linalg.det(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>np.float64(1.0)</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb226"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb226-1"><a href></a>np.linalg.eig(x.T <span class="op">@</span> x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb230"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb230-1"><a href></a>np.linalg.eig(x.T <span class="op">@</span> x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>EigResult(eigenvalues=array([ 0.43988174, 54.56011826]), eigenvectors=array([[-0.79911221, -0.6011819 ],
        [ 0.6011819 , -0.79911221]]))</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb228"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb228-1"><a href></a>np.linalg.inv(x.T <span class="op">@</span> x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb232"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb232-1"><a href></a>np.linalg.inv(x.T <span class="op">@</span> x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ 1.45833333, -1.08333333],
        [-1.08333333,  0.83333333]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb230"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb230-1"><a href></a>np.linalg.cholesky(x.T <span class="op">@</span> x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb234"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb234-1"><a href></a>np.linalg.cholesky(x.T <span class="op">@</span> x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[4.47213595, 0.        ],
        [5.81377674, 1.09544512]])</code></pre>
@@ -2028,28 +2039,25 @@ Dr. Colin Rundel
 <p>NumPy has another submodule called <code>random</code> for functions used to generate random values.</p>
 <p>In order to use this, you construct a generator via <code>default_rng()</code>, with or without a seed, and then use the generator’s methods to obtain your desired random values.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb232"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb232-1"><a href></a>rng <span class="op">=</span> np.random.default_rng(seed <span class="op">=</span> <span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb236"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb236-1"><a href></a>rng <span class="op">=</span> np.random.default_rng(seed <span class="op">=</span> <span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb233"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb233-1"><a href></a>rng.random(<span class="dv">3</span>) <span class="co"># ~ Uniform [0,1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb237"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb237-1"><a href></a>rng.random(<span class="dv">3</span>) <span class="co"># ~ Uniform [0,1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0.97669977, 0.38019574, 0.92324623])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb235"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb235-1"><a href></a>rng.normal(loc<span class="op">=</span><span class="dv">0</span>, scale<span class="op">=</span><span class="dv">2</span>, size <span class="op">=</span> (<span class="dv">2</span>,<span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb239"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb239-1"><a href></a>rng.normal(loc<span class="op">=</span><span class="dv">0</span>, scale<span class="op">=</span><span class="dv">2</span>, size <span class="op">=</span> (<span class="dv">2</span>,<span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ 0.30523839,  1.72748778],
        [ 5.82619845, -2.95764672]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb237"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb237-1"><a href></a>rng.binomial(n<span class="op">=</span><span class="dv">5</span>, p<span class="op">=</span><span class="fl">0.5</span>, size <span class="op">=</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb241"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb241-1"><a href></a>rng.binomial(n<span class="op">=</span><span class="dv">5</span>, p<span class="op">=</span><span class="fl">0.5</span>, size <span class="op">=</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([2, 4, 2, 2, 3, 4, 4, 3, 3, 3])</code></pre>
 </div>
 </div>
 </div>
-</section>
-<section id="example---linear-regression-with-numpy" class="slide level2">
-<h2>Example - Linear regression with NumPy</h2>
 </section></section>
 <section>
 <section id="advanced-indexing" class="title-slide slide level1 center">
@@ -2059,7 +2067,7 @@ Dr. Colin Rundel
 <section id="advanced-indexing-1" class="slide level2">
 <h2>Advanced Indexing</h2>
 <blockquote>
-<p>Advanced indexing is triggered when the selection object, obj, is a non-tuple sequence object, an ndarray (of data type integer or bool), or a tuple with at least one sequence object or ndarray (of data type integer or bool).</p>
+<p>Advanced indexing is triggered when the selection object, <code>obj</code>, is a non-tuple sequence object, an ndarray (of data type integer or bool), or a tuple with at least one sequence object or ndarray (of data type integer or bool).</p>
 <ul>
 <li><p>There are two types of advanced indexing: integer and Boolean.</p></li>
 <li><p>Advanced indexing always returns a <em>copy</em> of the data (contrast with basic slicing that returns a view).</p></li>
@@ -2074,7 +2082,7 @@ Dr. Colin Rundel
 <p>Lists of integers can be used to subset in the same way:</p>
 <div class="xsmall">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb239"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb239-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">16</span>).reshape((<span class="dv">4</span>,<span class="dv">4</span>))<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb243"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb243-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">16</span>).reshape((<span class="dv">4</span>,<span class="dv">4</span>))<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ 0,  1,  2,  3],
        [ 4,  5,  6,  7],
@@ -2086,17 +2094,17 @@ Dr. Colin Rundel
 <div class="columns xsmall">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb241"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb241-1"><a href></a>x[[<span class="dv">1</span>,<span class="dv">3</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb245"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb245-1"><a href></a>x[[<span class="dv">1</span>,<span class="dv">3</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ 4,  5,  6,  7],
        [12, 13, 14, 15]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb243"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb243-1"><a href></a>x[[<span class="dv">1</span>,<span class="dv">3</span>], ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb247"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb247-1"><a href></a>x[[<span class="dv">1</span>,<span class="dv">3</span>], ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ 4,  5,  6,  7],
        [12, 13, 14, 15]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb245"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb245-1"><a href></a>x[:, [<span class="dv">1</span>,<span class="dv">3</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb249"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb249-1"><a href></a>x[:, [<span class="dv">1</span>,<span class="dv">3</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ 1,  3],
        [ 5,  7],
@@ -2106,19 +2114,19 @@ Dr. Colin Rundel
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb247"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb247-1"><a href></a>x[[<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>],]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb251"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb251-1"><a href></a>x[[<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>],]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ 0,  1,  2,  3],
        [ 4,  5,  6,  7],
        [12, 13, 14, 15]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb249"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb249-1"><a href></a>x[[<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb253"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb253-1"><a href></a>x[[<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ 0,  1,  2,  3],
        [ 4,  5,  6,  7],
        [12, 13, 14, 15]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb251"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb251-1"><a href></a>x[[<span class="fl">1.</span>,<span class="dv">3</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb255"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb255-1"><a href></a>x[[<span class="fl">1.</span>,<span class="dv">3</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>IndexError: only integers, slices (`:`), ellipsis (`...`), numpy.newaxis (`None`) and integer or boolean arrays are valid indices</code></pre>
 </div>
@@ -2131,48 +2139,48 @@ Dr. Colin Rundel
 <div class="columns small">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb253"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb253-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)</span>
-<span id="cb253-2"><a href></a>y <span class="op">=</span> np.array([<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>])</span>
-<span id="cb253-3"><a href></a>z <span class="op">=</span> np.array([<span class="fl">1.</span>, <span class="fl">3.</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb257"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb257-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)</span>
+<span id="cb257-2"><a href></a>y <span class="op">=</span> np.array([<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">3</span>])</span>
+<span id="cb257-3"><a href></a>z <span class="op">=</span> np.array([<span class="fl">1.</span>, <span class="fl">3.</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb254"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb254-1"><a href></a>x[y,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb258"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb258-1"><a href></a>x[y,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 3])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb256"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb256-1"><a href></a>x[y]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb260"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb260-1"><a href></a>x[y]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 3])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb258"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb258-1"><a href></a>x[z]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb262"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb262-1"><a href></a>x[z]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>IndexError: arrays used as indices must be of integer (or boolean) type</code></pre>
 </div>
 </div>
 </div><div class="column fragment" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb260"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb260-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">16</span>).reshape((<span class="dv">4</span>,<span class="dv">4</span>))</span>
-<span id="cb260-2"><a href></a>y <span class="op">=</span> np.array([<span class="dv">1</span>,<span class="dv">3</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb264"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb264-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">16</span>).reshape((<span class="dv">4</span>,<span class="dv">4</span>))</span>
+<span id="cb264-2"><a href></a>y <span class="op">=</span> np.array([<span class="dv">1</span>,<span class="dv">3</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb261"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb261-1"><a href></a>x[y]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb265"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb265-1"><a href></a>x[y]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ 4,  5,  6,  7],
        [12, 13, 14, 15]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb263"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb263-1"><a href></a>x[y, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb267"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb267-1"><a href></a>x[y, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ 4,  5,  6,  7],
        [12, 13, 14, 15]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb265"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb265-1"><a href></a>x[:, y]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb269"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb269-1"><a href></a>x[:, y]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ 1,  3],
        [ 5,  7],
        [ 9, 11],
        [13, 15]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb267"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb267-1"><a href></a>x[y, y]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb271"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb271-1"><a href></a>x[y, y]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([ 5, 15])</code></pre>
 </div>
@@ -2183,8 +2191,8 @@ Dr. Colin Rundel
 <h2>Exercise 1</h2>
 <p>Given the following matrix,</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb269"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb269-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">16</span>).reshape((<span class="dv">4</span>,<span class="dv">4</span>))</span>
-<span id="cb269-2"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb273"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb273-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">16</span>).reshape((<span class="dv">4</span>,<span class="dv">4</span>))</span>
+<span id="cb273-2"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ 0,  1,  2,  3],
        [ 4,  5,  6,  7],
@@ -2199,7 +2207,7 @@ Dr. Colin Rundel
 <p>Lists or ndarrays of boolean values can also be used to subset (positions with <code>True</code> are kept and <code>False</code> are discarded)</p>
 <div class="small">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb271"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb271-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb275"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb275-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 2, 3, 4, 5])</code></pre>
 </div>
@@ -2208,11 +2216,11 @@ Dr. Colin Rundel
 <div class="fragment">
 <div class="small">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb273"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb273-1"><a href></a>x[[<span class="va">True</span>, <span class="va">False</span>, <span class="va">True</span>, <span class="va">False</span>, <span class="va">True</span>, <span class="va">False</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb277"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb277-1"><a href></a>x[[<span class="va">True</span>, <span class="va">False</span>, <span class="va">True</span>, <span class="va">False</span>, <span class="va">True</span>, <span class="va">False</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 2, 4])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb275"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb275-1"><a href></a>x[[<span class="va">True</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb279"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb279-1"><a href></a>x[[<span class="va">True</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>IndexError: boolean index did not match indexed array along axis 0; size of axis is 6 but size of corresponding boolean axis is 1</code></pre>
 </div>
@@ -2222,11 +2230,11 @@ Dr. Colin Rundel
 <div class="fragment">
 <div class="small">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb277"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb277-1"><a href></a>x[np.array([<span class="va">True</span>, <span class="va">False</span>, <span class="va">True</span>, <span class="va">False</span>, <span class="va">True</span>, <span class="va">False</span>])]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb281"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb281-1"><a href></a>x[np.array([<span class="va">True</span>, <span class="va">False</span>, <span class="va">True</span>, <span class="va">False</span>, <span class="va">True</span>, <span class="va">False</span>])]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 2, 4])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb279"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb279-1"><a href></a>x[np.array([<span class="va">True</span>])]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb283"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb283-1"><a href></a>x[np.array([<span class="va">True</span>])]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>IndexError: boolean index did not match indexed array along axis 0; size of axis is 6 but size of corresponding boolean axis is 1</code></pre>
 </div>
@@ -2239,7 +2247,7 @@ Dr. Colin Rundel
 <p>The primary utility of boolean subsetting comes from vectorized comparison operations,</p>
 <div class="small">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb281"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb281-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb285"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb285-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 2, 3, 4, 5])</code></pre>
 </div>
@@ -2248,33 +2256,33 @@ Dr. Colin Rundel
 <div class="columns small">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb283"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb283-1"><a href></a>x <span class="op">&gt;</span> <span class="dv">3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb287"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb287-1"><a href></a>x <span class="op">&gt;</span> <span class="dv">3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([False, False, False, False,  True,  True])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb285"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb285-1"><a href></a>x[x<span class="op">&gt;</span><span class="dv">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb289"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb289-1"><a href></a>x[x<span class="op">&gt;</span><span class="dv">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([4, 5])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb287"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb287-1"><a href></a>x <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb291"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb291-1"><a href></a>x <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([False,  True, False,  True, False,  True])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb289"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb289-1"><a href></a>x[x <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb293"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb293-1"><a href></a>x[x <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([1, 3, 5])</code></pre>
 </div>
 </div>
 </div><div class="column fragment" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb291"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb291-1"><a href></a>y <span class="op">=</span> np.arange(<span class="dv">9</span>).reshape((<span class="dv">3</span>,<span class="dv">3</span>))</span>
-<span id="cb291-2"><a href></a>y <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb295"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb295-1"><a href></a>y <span class="op">=</span> np.arange(<span class="dv">9</span>).reshape((<span class="dv">3</span>,<span class="dv">3</span>))</span>
+<span id="cb295-2"><a href></a>y <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[ True, False,  True],
        [False,  True, False],
        [ True, False,  True]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb293"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb293-1"><a href></a>y[y <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb297"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb297-1"><a href></a>y[y <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 2, 4, 6, 8])</code></pre>
 </div>
@@ -2286,11 +2294,11 @@ Dr. Colin Rundel
 <p>If we want to use a logical operators on an array we need to use <code>&amp;</code>, <code>|</code>, and <code>~</code> instead of <code>and</code>, <code>or</code>, and <code>not</code> respectively.</p>
 <div class="medium">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb295"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb295-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb299"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb299-1"><a href></a>x <span class="op">=</span> np.arange(<span class="dv">6</span>)<span class="op">;</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([0, 1, 2, 3, 4, 5])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb297"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb297-1"><a href></a>y <span class="op">=</span> (x <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span>)<span class="op">;</span> y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb301"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb301-1"><a href></a>y <span class="op">=</span> (x <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span>)<span class="op">;</span> y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([ True, False,  True, False,  True, False])</code></pre>
 </div>
@@ -2298,7 +2306,7 @@ Dr. Colin Rundel
 </div>
 <div class="medium fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb299"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb299-1"><a href></a><span class="op">~</span>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb303"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb303-1"><a href></a><span class="op">~</span>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([False,  True, False,  True, False,  True])</code></pre>
 </div>
@@ -2306,7 +2314,7 @@ Dr. Colin Rundel
 </div>
 <div class="medium fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb301"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb301-1"><a href></a>y <span class="op">&amp;</span> (x <span class="op">&gt;</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb305"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb305-1"><a href></a>y <span class="op">&amp;</span> (x <span class="op">&gt;</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([False, False, False, False,  True, False])</code></pre>
 </div>
@@ -2314,7 +2322,7 @@ Dr. Colin Rundel
 </div>
 <div class="medium fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb303"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb303-1"><a href></a>y <span class="op">|</span> (x <span class="op">&gt;</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb307"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb307-1"><a href></a>y <span class="op">|</span> (x <span class="op">&gt;</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([ True, False,  True, False,  True,  True])</code></pre>
 </div>
@@ -2326,21 +2334,21 @@ Dr. Colin Rundel
 <p>One other useful function in NumPy is <code>meshgrid()</code> which generates all possible combinations between the input vectors (as a tuple of ndarrays),</p>
 <div class="small">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb305"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb305-1"><a href></a>pts <span class="op">=</span> np.arange(<span class="dv">3</span>)</span>
-<span id="cb305-2"><a href></a>x, y <span class="op">=</span> np.meshgrid(pts, pts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb309"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb309-1"><a href></a>pts <span class="op">=</span> np.arange(<span class="dv">3</span>)</span>
+<span id="cb309-2"><a href></a>x, y <span class="op">=</span> np.meshgrid(pts, pts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div class="fragment">
 <div class="columns small">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb306"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb306-1"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb310"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb310-1"><a href></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[0, 1, 2],
        [0, 1, 2],
        [0, 1, 2]])</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb308"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb308-1"><a href></a>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb312"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb312-1"><a href></a>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[0, 0, 0],
        [1, 1, 1],
@@ -2349,7 +2357,7 @@ Dr. Colin Rundel
 </div>
 </div><div class="column fragment" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb310"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb310-1"><a href></a>np.sqrt(x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> y<span class="op">**</span><span class="dv">2</span>).<span class="bu">round</span>(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb314"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb314-1"><a href></a>np.sqrt(x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> y<span class="op">**</span><span class="dv">2</span>).<span class="bu">round</span>(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([[0.   , 1.   , 2.   ],
        [1.   , 1.414, 2.236],
