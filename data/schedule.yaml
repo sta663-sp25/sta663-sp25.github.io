@@ -73,6 +73,8 @@ schedule:
     link: https://numpy.org/doc/stable/user/quickstart.html
   - text: NumPy API Reference
     link: https://numpy.org/doc/stable/reference/index.html
+  - text: Advanced indexing
+    link: https://numpy.org/doc/stable/user/basics.indexing.html#advanced-indexing
   notes: 
 
 - week: 3
@@ -83,8 +85,6 @@ schedule:
   readings:
   - text: Broadcasting
     link: https://numpy.org/doc/stable/user/basics.broadcasting.html
-  - text: Advanced indexing
-    link: https://numpy.org/doc/stable/user/basics.indexing.html#advanced-indexing
   notes: 
 
 - week: 4
