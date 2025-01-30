@@ -80,7 +80,7 @@ schedule:
 - week: 3
   day: 5
   lecture: "NumPy / JAX"
-  slides: 
+  slides: Lec06
   screencast: 
   readings:
   - text: Broadcasting
