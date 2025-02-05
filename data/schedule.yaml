@@ -80,7 +80,7 @@ schedule:
 - week: 3
   day: 5
   lecture: "NumPy / JAX"
-  slides: 
+  slides: Lec06
   screencast: 
   readings:
   - text: Broadcasting
@@ -89,30 +89,39 @@ schedule:
 
 - week: 4
   day: 3
-  lecture: "Data Frames (arrow, pandas, polars)"
-  slides: 
+  lecture: "pandas"
+  slides: Lec07
   screencast: 
   readings:
   - text: Python for Data Analysis (Early Release)
     link: https://wesmckinney.com/book/pandas-basics.html
   notes:
 
-
 - week: 4
   day: 5
-  lecture: "Visualization"
+  lecture: "polars"
   slides: 
   screencast: 
   readings:
-  - text: matplotlib tutorials
-    link: https://matplotlib.org/stable/tutorials/index
-  - text: pandas chart visualization
-    link: https://pandas.pydata.org/pandas-docs/stable/user_guide/visualization.html
-  - text: seaborn user guide
-    link: https://seaborn.pydata.org/tutorial.html
-  - text: plotnine
-    link: https://plotnine.readthedocs.io/en/stable/
-  notes: 
+  - text: Polars user guide
+    link: https://docs.pola.rs/
+  notes:
+
+#- week: 4
+#  day: 5
+#  lecture: "Visualization"
+#  slides: 
+#  screencast: 
+#  readings:
+#  - text: matplotlib tutorials
+#    link: https://matplotlib.org/stable/tutorials/index
+#  - text: pandas chart visualization
+#    link: https://pandas.pydata.org/pandas-docs/stable/user_guide/visualization.html
+#  - text: seaborn user guide
+#    link: https://seaborn.pydata.org/tutorial.html
+#  - text: plotnine
+#    link: https://plotnine.readthedocs.io/en/stable/
+#  notes: 
 
 - week: 5
   day: 3
