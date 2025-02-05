@@ -79,7 +79,7 @@ schedule:
 
 - week: 3
   day: 5
-  lecture: "NumPy / JAX"
+  lecture: "NumPy & JAX"
   slides: Lec06
   screencast: 
   readings:
@@ -89,7 +89,7 @@ schedule:
 
 - week: 4
   day: 3
-  lecture: "pandas"
+  lecture: "Data frames - pandas"
   slides: Lec07
   screencast: 
   readings:
@@ -99,7 +99,7 @@ schedule:
 
 - week: 4
   day: 5
-  lecture: "polars"
+  lecture: "Data frames - polars"
   slides: 
   screencast: 
   readings:
@@ -107,24 +107,24 @@ schedule:
     link: https://docs.pola.rs/
   notes:
 
-#- week: 4
-#  day: 5
-#  lecture: "Visualization"
-#  slides: 
-#  screencast: 
-#  readings:
-#  - text: matplotlib tutorials
-#    link: https://matplotlib.org/stable/tutorials/index
-#  - text: pandas chart visualization
-#    link: https://pandas.pydata.org/pandas-docs/stable/user_guide/visualization.html
-#  - text: seaborn user guide
-#    link: https://seaborn.pydata.org/tutorial.html
-#  - text: plotnine
-#    link: https://plotnine.readthedocs.io/en/stable/
-#  notes: 
-
 - week: 5
   day: 3
+  lecture: "Visualization (pyplot & seaborn)"
+  slides: 
+  screencast: 
+  readings:
+  - text: matplotlib tutorials
+    link: https://matplotlib.org/stable/tutorials/index
+  - text: pandas chart visualization
+    link: https://pandas.pydata.org/pandas-docs/stable/user_guide/visualization.html
+  - text: seaborn user guide
+    link: https://seaborn.pydata.org/tutorial.html
+  - text: plotnine
+    link: https://plotnine.readthedocs.io/en/stable/
+  notes: 
+
+- week: 5
+  day: 5
   lecture: "scikit-learn"
   slides: 
   screencast: 
@@ -135,13 +135,6 @@ schedule:
     link: https://scikit-learn.org/stable/getting_started.html
   notes:
 
-- week: 5
-  day: 5
-  lecture: "scikit-learn (cont.)"
-  screencast: 
-  slides: 
-  readings:
-  notes: 
 
 - week: 6
   day: 3
