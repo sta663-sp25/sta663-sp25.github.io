@@ -63,7 +63,7 @@ np.set_printoptions(
 
 We will not spend much time on this as most data you will encounter is more likely to be a tabular format (e.g. data frame) and tools like Pandas are more appropriate.
 
-For basic saving and loading of NumPy arrays there are the `save()` and `load()` functions which use a built in binary format.
+For basic saving and loading of NumPy arrays there are the `save()` and `load()` functions which use a custom binary format.
 
 ```{python}
 x = np.arange(1e5)
@@ -130,9 +130,13 @@ Using broadcasts can be more efficient as it does not copy the broadcast data,
 x = np.arange(1e5)
 y = np.array([2]).repeat(1e5)
 ```
+:::
 
 <br/>
 
+. . .
+
+::: {.small}
 ```{python}
 #| eval: false
 %timeit x * 2
@@ -140,7 +144,11 @@ y = np.array([2]).repeat(1e5)
 ```
 13.1 μs ± 297 ns per loop (mean ± std. dev. of 7 runs, 100,000 loops each)
 ```
+:::
 
+. . .
+
+::: {.small}
 ```{python}
 #| eval: false
 %timeit x * np.array([2])
@@ -148,7 +156,11 @@ y = np.array([2]).repeat(1e5)
 ```
 18.3 μs ± 96.4 ns per loop (mean ± std. dev. of 7 runs, 10,000 loops each)
 ```
+:::
 
+. . .
+
+::: {.small}
 ```{python}
 #| eval: false
 %timeit x * y
@@ -156,7 +168,11 @@ y = np.array([2]).repeat(1e5)
 ```
 61.4 μs ± 465 ns per loop (mean ± std. dev. of 7 runs, 10,000 loops each)
 ```
+:::
 
+. . .
+
+::: {.small}
 ```{python}
 #| eval: false
 %timeit x * np.array([2]).repeat(1e5)
@@ -258,49 +274,6 @@ x + np.array([1,2,3]).reshape(3,1)
 ::::
 
 ## Examples (2)
-
-:::: {.columns .small}
-::: {.column width='50%'}
-```{python}
-x = np.arange(12).reshape((4,3))
-y = 1
-x+y
-```
-:::
-
-::: {.column width='50%' .fragment}
-```{python}
-x = np.arange(12).reshape((4,3))
-y = np.array([1,2,3])
-x+y
-```
-:::
-::::
-
-. . .
-
-:::: {.columns}
-::: {.column width='50%' .callout-note appearance="minimal"}
-```
-    x    (2d array): 4 x 3
-    y    (1d array):     1 
-    ----------------------
-    x+y  (2d array): 4 x 3
-```
-:::
-
-::: {.column width='50%' .fragment .callout-note appearance="minimal"}
-```
-    x    (2d array): 4 x 3
-    y    (1d array):     3 
-    ----------------------
-    x+y  (2d array): 4 x 3
-```
-:::
-::::
-
-
-## Examples (3)
 
 ::: {.xsmall}
 ```{python}
@@ -523,7 +496,7 @@ As we've just seen a JAX array is very similar to a numpy array but there are so
 
 - JAX arrays are immutable
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 #| error: true
 x = jnp.array([3, 2, 1])
@@ -531,9 +504,9 @@ x[0] = 2
 ```
 :::
 
-- because of the above JAX does not support inplace operations - the result will be a copy
+- related to the above JAX does not support inplace operations - these functions now create and return a copy of the array
 
-::: {.columns .small}
+::: {.columns .xsmall}
 ::: {.column}
 ```{python}
 y = x.sort()
@@ -550,28 +523,51 @@ np.shares_memory(x,y)
 
 ##
 
-- The default JAX array dtype is `float32` not `float64` 
+- The default JAX array dtypes 32 bits not 64 bits (i.e. `float32` not `float64` and `int32` not `int64`)
 
-  ::: {.small}
+  ::: {.columns .xsmall}
+  ::: {.column}
   ```{python}
   #| warning: true
   jnp.array([1, 2, 3])
+  ```
+  :::
+  ::: {.column}
+  ```{python}
+  #| warning: true
+  jnp.array([1., 2., 3.])
+  ```
+  :::
+  :::
+
+  ::: {.xsmall}
+  ```{python}
+  #| warning: true
   jnp.array([1, 2, 3], dtype=jnp.float64)
   ```
   :::
 
   64-bit dtypes can be enabled by setting `jax_enable_x64=True` in the JAX configuration.
 
-  ::: {.small}
+  ::: {.xsmall}
   ```{python}
   jax.config.update("jax_enable_x64", True)
   ```
+  :::
 
+  ::: {.columns .xsmall}
+  ::: {.column}
   ```{python}
   jnp.array([1, 2, 3])
+  ```
+  :::
+  ::: {.column}
+  ```{python}
   jnp.array([1., 2., 3.])
   ```
   :::
+  :::
+
 
 
 
@@ -644,7 +640,7 @@ How do we guarantee that we get consistent results if we don't know the order th
 
 ## PRNG keys
 
-JAX makes use of *random keys* which are just a fancier version of random seeds - all of JAX's random functions require a key be passed in.
+JAX makes use of *random keys* which are just a fancier version of random seeds - all of JAX's random functions require a key as their first argument.
 
 ::: {.small}
 ```{python}
@@ -678,7 +674,7 @@ Note that JAX does not provide a sequential equivalence guarantee - this is so t
 
 Since a key is essentially a seed we do not want to reuse them (unless we want an identical output). Therefore to generate multiple different PRN we can split a key to deterministically generate two (or more) new keys.
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
 key11, key12 = jax.random.split(key)
@@ -700,7 +696,7 @@ f"{key22=}"
 
 . . .
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 key3 = jax.random.split(key, num=3)
 key3
@@ -909,7 +905,7 @@ When it works the jit tool is fantastic, but it does have a number of limitation
 The `grad()` function takes a numerical function, returning a scalar, and returns a function for calculating the gradient of that function.
 
 :::: {.columns .xsmall}
-::: {.column width='33%'}
+::: {.column width='33%' .fragment}
 ```{python}
 def f(x):
   return x**2
