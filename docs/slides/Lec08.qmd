@@ -760,6 +760,9 @@ df.select(pl.len()).explain()
 ```
 :::
 
+::: {.aside}
+These data are available on `rstudio.stat.duke.edu` in the `/data/nyctaxi` directory.
+:::
 
 ## Large lazy queries
 
