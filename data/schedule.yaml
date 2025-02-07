@@ -100,7 +100,7 @@ schedule:
 - week: 4
   day: 5
   lecture: "Data frames - polars"
-  slides: 
+  slides: Lec08
   screencast: 
   readings:
   - text: Polars user guide
