@@ -110,7 +110,7 @@ schedule:
 - week: 5
   day: 3
   lecture: "Visualization (pyplot & seaborn)"
-  slides: 
+  slides: Lec09
   screencast: 
   readings:
   - text: matplotlib tutorials
