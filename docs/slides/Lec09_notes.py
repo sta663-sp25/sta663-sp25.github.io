@@ -1,14 +1,15 @@
 import numpy as np
-import pandas as pd
+import matplotlib.pyplot as plt
 
-## Exercise 1
+x = np.linspace(0, 2, 201)
+y = np.sin(2 * np.pi * x) + 1
 
-df = pd.read_csv("https://sta663-sp25.github.io/slides/data/us_rent.csv")
+plt.figure(layout="constrained")
 
-( df
-  .pivot(index="name", columns="variable", values="estimate")
-  .assign(
-    ratio = lambda d: d.income / d.rent
-  )
-  .sort_values("ratio", ascending=True)
-)
+plt.plot(x, y)
+plt.title("About as simple as it gets, folks")
+plt.xlabel("time (s)")
+plt.ylabel("voltage (mV)")
+plt.grid(True)
+
+plt.show()

@@ -1,6 +1,6 @@
 ---
 title: "matplotlib / pyplot <br/> & seaborn"
-subtitle: "Lecture 10"
+subtitle: "Lecture 9"
 author: "Dr. Colin Rundel"
 footer: "Sta 663 - Spring 2025"
 format:
