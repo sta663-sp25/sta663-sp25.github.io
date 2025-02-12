@@ -52,8 +52,16 @@ import polars as pl
 
 ```{python}
 import matplotlib as mpl
+```
+
+
+> `matplotlib.pyplot` is a collection of functions that make matplotlib work like MATLAB. Each `pyplot` function makes some change to a figure: e.g., creates a figure, creates a plotting area in a figure, plots some lines in a plotting area, decorates the plot with labels, etc.
+
+```{python}
 import matplotlib.pyplot as plt
 ```
+
+
 
 ## Plot anatomy
 
@@ -76,6 +84,24 @@ knitr::include_graphics("imgs/anatomy.webp")
 ::::
 
 
+## Basic plot - pyplot style
+
+::: {.xsmall}
+```{python}
+#| fig-align: center
+x = np.linspace(0, 2*np.pi, 100)
+y1 = np.sin(x)
+y2 = np.cos(x)
+
+plt.figure(figsize=(6, 3))
+plt.plot(x, y1, label="sin(x)")
+plt.plot(x, y2, label="cos(x)")
+plt.title("Simple Plot")
+plt.legend()
+```
+:::
+
+
 ## Basic plot - OO style
 
 ::: {.xsmall}
@@ -94,22 +120,7 @@ ax.legend()
 :::
 
 
-## Basic plot - pyplot style
 
-::: {.xsmall}
-```{python}
-#| fig-align: center
-x = np.linspace(0, 2*np.pi, 100)
-y1 = np.sin(x)
-y2 = np.cos(x)
-
-plt.figure(figsize=(6, 3))
-plt.plot(x, y1, label="sin(x)")
-plt.plot(x, y2, label="cos(x)")
-plt.title("Simple Plot")
-plt.legend()
-```
-:::
 
 
 ## Subplots (OO)
@@ -205,7 +216,7 @@ axs[1,1].plot(x, x**4, "c", label="quartic")
 ::: {.xsmall}
 ```{python}
 #| output-location: column
-#| code-line-numbers: "|3-7|9,13|10,14,11,15"
+#| code-line-numbers: "|3-7|9,13|10,14|11,15"
 x = np.linspace(-2, 2, 101)
 
 fig, axd = plt.subplot_mosaic(
@@ -347,12 +358,14 @@ plt.show()
 Data can also come from DataFrame objects or series, 
 
 
+::: {.small}
 ```{python}
 #| output-location: slide
+rho = 0.75
 df = pd.DataFrame({
   "x": np.random.normal(size=10000)
 }).assign(
-  y = lambda d: np.random.normal(0.75*d.x, np.sqrt(1-0.75**2), size=10000)
+  y = lambda d: np.random.normal(rho*d.x, np.sqrt(1-rho**2), size=10000)
 )
 
 fig, ax = plt.subplots(figsize=(5,5))
@@ -361,20 +374,23 @@ ax.scatter('x', 'y', c='k', data=df, alpha=0.1, s=0.5)
 
 ax.set_xlabel('x')
 ax.set_ylabel('y')
-ax.set_title("Bivariate normal ($\\rho=0.75$)")
+ax.set_title(f"Bivariate normal ($\\rho={rho}$)")
 ```
+:::
 
 ## pyplot w/ polars
 
 Data can also come from DataFrame objects or series, 
 
 
+::: {.small}
 ```{python}
 #| output-location: slide
+rho = -0.95
 df = pl.DataFrame({
   "x": np.random.normal(size=10000)
 }).with_columns(
-  y = 0.95*pl.col("x") + np.random.normal(0, np.sqrt(1-0.95**2), size=10000)
+  y = rho*pl.col("x") + np.random.normal(0, np.sqrt(1-rho**2), size=10000)
 )
 
 fig, ax = plt.subplots(figsize=(5,5))
@@ -383,9 +399,9 @@ ax.scatter('x', 'y', c='k', data=df, alpha=0.1, s=0.5)
 
 ax.set_xlabel('x')
 ax.set_ylabel('y')
-ax.set_title("Bivariate normal ($\\rho=0.95$)")
+ax.set_title(f"Bivariate normal ($\\rho={rho}$)")
 ```
-
+:::
 
 
 ## Scales
@@ -394,14 +410,14 @@ Axis scales can be changed via `plt.xscale()`, `plt.yscale()`, `ax.set_xscale()`
 
 ::: {.xsmall}
 ```{python}
-#| output-location: column
+#| output-location: slide
 y = np.sort( np.random.sample(size=1000) )
 x = np.arange(len(y))
 
 plt.figure(layout="constrained")
 
 scales = ['linear', 'log', 'symlog', 'logit']
-for i, scale in zip(range(4), scales):
+for i, scale in enumerate(scales):
   plt.subplot(221+i)
   plt.plot(x, y)
   plt.grid(True)
@@ -576,7 +592,7 @@ knitr::include_graphics("imgs/seaborn_levels.png")
 ```
 
 ::: {.aside}
-These are not the only axes-level functions - we will see additional plotting functions shortly
+These are not the only axes-level functions - we will see additional plotting functions today
 :::
 
 
@@ -851,7 +867,7 @@ Details based on [seaborn docs](https://seaborn.pydata.org/tutorial/function_ove
 
 ## lmplots
 
-There is one last figure-level plot type - `lmplot()` which is a convenient interface to fitting and ploting regression models across subsets of data,
+There is one additional figure-level plot type - `lmplot()` which is a convenient interface to fitting and ploting regression models across subsets of data,
 
 ::: {.small}
 ```{python}
