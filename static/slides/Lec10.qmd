@@ -378,7 +378,9 @@ summary(lm)
 lm1 = LinearRegression(
   fit_intercept = False
 ).fit(
-  X = pd.get_dummies(books[["volume", "cover"]]),
+  X = pd.get_dummies(
+    books[["volume", "cover"]]
+  ),
   y = books.weight
 )
 ```
@@ -1001,12 +1003,12 @@ ct = make_column_transformer(
 ).fit(
   books
 )
+ct.get_feature_names_out()
 ```
 :::
 
 ::: {.column width='50%'}
 ```{python}
-ct.get_feature_names_out()
 ct.transform(books)
 ```
 :::
@@ -1054,7 +1056,7 @@ from sklearn.compose import make_column_selector
 ```
 :::
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
 ct = make_column_transformer(
@@ -1096,7 +1098,7 @@ ct = make_column_transformer(
 
 ##
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
 ct.fit_transform(books)
