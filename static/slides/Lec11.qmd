@@ -189,7 +189,6 @@ for a in alpha:
     rg = Ridge(alpha=a).fit(
       X_train, y_train
     )
-    
     train_rmse.append( 
      root_mean_squared_error(
         y_train, rg.predict(X_train)
@@ -265,7 +264,7 @@ cross_val_score(
 
 
 ::: {.aside}
-🚩🚩🚩 Note that the default k-fold cross validation used here does not shuffle your data which can be massively problematic if your data is ordered 🚩🚩🚩 
+🚩🚩🚩 Note that the default k-fold cross validation used here does not shuffle the data which can be massively problematic if the data is ordered 🚩🚩🚩 
 :::
 
 ## Controlling k-fold behavior
@@ -296,7 +295,7 @@ ex = pd.DataFrame(data = list(range(10)), columns=["x"])
 ```
 :::
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
 cv = KFold(5)
@@ -380,6 +379,7 @@ We can further reduce the amount of code needed if there is a specific set of pa
 
 ::: {.small}
 ```{python}
+#| code-line-numbers: "|4|5|6|7"
 from sklearn.model_selection import GridSearchCV
 
 gs = GridSearchCV(
@@ -393,7 +393,9 @@ gs = GridSearchCV(
 ```
 :::
 
-##
+## `best_*` attributes
+
+`GridSearchCV()`'s return object contains attributes with details on the "best" model based on the chosen scoring metric.
 
 ```{python}
 gs.best_index_
@@ -403,7 +405,7 @@ gs.best_score_
 
 ## `best_estimator_` attribute
 
-If `refit = True` (the default) with `GridSearchCV()` then the `best_estimator_` attribute will be available which gives direct access to the "best" model or pipeline object. This model is constructed by using the parameter(s) that achieved the maximum score and refitting the model to the complete data set.
+If `refit = True` (default) with `GridSearchCV()` then the `best_estimator_` attribute will be available which gives direct access to the "best" model or pipeline object. This model is constructed by using the parameter(s) that achieved the minimum score and refitting the model to the complete data set.
 
 ::: {.xsmall}
 ```{python}
@@ -418,7 +420,7 @@ gs.best_estimator_.predict(X)
 
 ## `cv_results_` attribute
 
-Other useful details about the grid search process are stored in the dictionary `cv_results_` attribute which includes things like average test scores, fold level test scores, test ranks, test runtimes, etc.
+Other useful details about the grid search process are stored as a dictionary in the `cv_results_` attribute which includes things like average test scores, fold level test scores, test ranks, test runtimes, etc.
 
 ::: {.xsmall}
 ```{python}
@@ -436,6 +438,7 @@ gs.cv_results_["param_alpha"]
 ::: {.small}
 ```{python}
 #| output-location: slide
+#| code-line-numbers: "|1|2|3|4|7,9-14"
 alpha = np.array(gs.cv_results_["param_alpha"], dtype="float64")
 score = -gs.cv_results_["mean_test_score"]
 score_std = gs.cv_results_["std_test_score"]
@@ -585,7 +588,11 @@ From the documentations,
 
 ## Penalty parameter
 
-🚩🚩🚩 `LogisticRegression()` has a parameter called penalty that applies a `"l1"` (lasso), `"l2"` (ridge), `"elasticnet"` or `None` with `"l2"` being the default. To make matters worse, the regularization is controlled by the parameter `C` which defaults to 1 (not 0) - also `C` is the inverse regularization strength (e.g. different from `alpha` for ridge and lasso models). 🚩🚩🚩
+🚩🚩🚩 
+
+`LogisticRegression()` has a parameter called penalty that applies a `"l1"` (lasso), `"l2"` (ridge), `"elasticnet"` or `None` with `"l2"` being the default. To make matters worse, the regularization is controlled by the parameter `C` which defaults to 1 (not 0) - also `C` is the inverse regularization strength (e.g. different from `alpha` for ridge and lasso models). 
+
+🚩🚩🚩
 
 $$
 \min_{w, c} \frac{1 - \rho}{2}w^T w + \rho |w|_1 + C \sum_{i=1}^n \log(\exp(- y_i (X_i^T w + c)) + 1),
@@ -831,8 +838,8 @@ mc_log_cv.best_score_
 
 ::: {.xsmall}
 ```{python}
-for p, s in  zip(mc_log_cv.cv_results_["params"], mc_log_cv.cv_results_["mean_test_score"]):
-  print(p,"Score:",s)
+for param, score in  zip(mc_log_cv.cv_results_["params"], mc_log_cv.cv_results_["mean_test_score"]):
+  f"{param=}, {score=}"
 ```
 :::
 
