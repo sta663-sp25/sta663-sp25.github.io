@@ -1,17 +1,17 @@
 ## Setup
 
 import numpy as np
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
 import seaborn as sns
 
 import sklearn
+sklearn.set_config(display="text")
 
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.model_selection import GridSearchCV, KFold, StratifiedKFold
-
+from sklearn.model_selection import GridSearchCV, KFold, StratifiedKFold, train_test_split
+from sklearn.metrics import accuracy_score, confusion_matrix
 
 
 ## Digits
@@ -47,36 +47,3 @@ confusion_matrix(
 )
 
 
-### GridSearchCV w/ multiple models
-
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.pipeline import Pipeline
-
-p = Pipeline([
-  ("model", DecisionTreeClassifier())
-])
-
-
-digits_tree = GridSearchCV(
-  p,
-  param_grid = {
-    "model": [
-      DecisionTreeClassifier(),
-      RandomForestClassifier()
-    ],
-    "model__criterion": ["gini", "entropy"],
-    "model__max_depth": range(2,10)
-  },
-  cv = KFold(5, shuffle=True, random_state=12345),
-  n_jobs = 4
-).fit(
-  X_train, y_train
-)
-
-digits_tree.best_estimator_
-digits_tree.best_score_
-
-accuracy_score(y_test, digits_tree.best_estimator_.predict(X_test))
-confusion_matrix(
-  y_test, digits_tree.best_estimator_.predict(X_test)
-)
