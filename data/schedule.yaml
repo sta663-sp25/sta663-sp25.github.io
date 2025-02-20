@@ -146,8 +146,8 @@ schedule:
 
 - week: 6
   day: 5
-  lecture: "patsy + statsmodels"
-  slides: 
+  lecture: "Custom transformers + patsy & statsmodels"
+  slides: Lec12
   screencast: 
   readings:
   - text: patsy docs
