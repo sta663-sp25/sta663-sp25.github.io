@@ -1,8 +1,10 @@
+import pandas as pd
+import numpy as np
+
+import sklearn
+sklearn.set_config(display="text")
 from sklearn.base import BaseEstimator, TransformerMixin
-
-from sklearn.utils.validation import check_X_y, check_is_fitted
-
-
+from sklearn.utils.validation import check_is_fitted, validate_data, _check_feature_names
 
 class interact_features(BaseEstimator, TransformerMixin):
   def __init__(self, interaction_only = False, include_intercept = False):
@@ -11,16 +13,16 @@ class interact_features(BaseEstimator, TransformerMixin):
   
   def fit(self, X, y=None):
     # https://github.com/scikit-learn/scikit-learn/blob/main/sklearn/base.py#L495
-    self._validate_data(X=X, reset=True, ensure_min_features=2)
-    self._check_feature_names(X=X, reset=True)
+    validate_data(self, X=X, reset=True, ensure_min_features=2)
+    _check_feature_names(self, X=X, reset=True)
 
     return self
   
   def transform(self, X, y=None):
     check_is_fitted(self, "n_features_in_")
     
-    self._validate_data(X=X, reset=False)
-    self._check_feature_names(X=X, reset=False)
+    validate_data(self, X=X, reset=False)
+    _check_feature_names(self, X=X, reset=False)
     
     X = np.array(X)
     
@@ -54,7 +56,7 @@ class interact_features(BaseEstimator, TransformerMixin):
         new_feat_names.append( feat_names[i] + " * " + feat_names[j] )
     
     if not self.interaction_only:
-      new_feat_names = feat_names + new_feat_names
+      new_feat_names = np.concatenate((feat_names, new_feat_names), axis=0)
       
     if self.include_intercept:
       new_feat_names = ["1"] + new_feat_names
@@ -70,6 +72,7 @@ itf = interact_features().fit(X)
 itf.n_features_in_
 itf.feature_names_in_
 itf.transform(X)
+itf.get_feature_names_out()
 
 itf2 = interact_features().fit(Z)
 itf2.n_features_in_

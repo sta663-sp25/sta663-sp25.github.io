@@ -195,12 +195,12 @@ X = pd.DataFrame({
 ::: {.column}
 ```{python}
 double = scaler(2)
+double.get_params()
 double.fit_transform(X)
 ```
 :::
-::: {.column}
+::: {.column .fragment}
 ```{python}
-double.get_params()
 double.set_params(b=-3).fit_transform(X)
 ```
 :::
@@ -233,7 +233,7 @@ print(
 
 We employed a couple of special methods that are worth mentioning in a little more detail.
 
-* `_validate_data()` & `_check_feature_names()` are methods that are inherited from `BaseEstimator` they are responsible for setting and checking the `n_features_in_` and the `feature_names_in_` attributes respectively.
+* `validate_data()` & `_check_feature_names()` are functions from `sklearn.base.validate` they are responsible for setting and checking the `n_features_in_` and the `feature_names_in_` attributes respectively.
 
 * In general one or both is run during `fit()` with `reset=True` in which case the respective attribute will be set.
 
@@ -241,9 +241,6 @@ We employed a couple of special methods that are worth mentioning in a little mo
 
 * These are worth using as they promote an interface consistent with sklearn and also provide convenient error checking with useful warning / error messages.
 
-::: {.aside}
-These methods are part of `BaseEstimator` but are not available as part of the published documentation see the code on [GitHub](https://github.com/scikit-learn/scikit-learn/blob/30bf6f39a7126a351db8971d24aa865fa5605569/sklearn/base.py#L125) or use `?sklearn.base.BaseEstimator._validate_data`
-:::
 
 
 ## `check_is_fitted()`
@@ -284,6 +281,7 @@ If you want to implement your own custom modeling function it is possible, there
 >
 > Patsy’s goal is to become the standard high-level interface to describing statistical models in Python, regardless of what particular model or library is being used underneath.
 
+
 ## Formulas
 
 ::: {.small}
@@ -297,6 +295,11 @@ ModelDesc.from_formula("y ~ a*b + np.log(x) - 1")
 ```
 :::
 
+::: {.aside}
+This general syntax is known as [Wilkinson Notation](https://www.mathworks.com/help/stats/wilkinson-notation.html) and come from Wilkinson and Rogers. "Symbolic description of factorial models for analysis of variance." J. Royal Statistics Society 22, pp. 392–399, 1973.
+:::
+
+
 ## Model matrix
 
 
@@ -306,16 +309,17 @@ from patsy import demo_data, dmatrix, dmatrices
 ```
 :::
 
-:::: {.columns .xsmall}
-::: {.column width='50%'}
+:::: {.columns .xxsmall}
+::: {.column width='35%'}
 ```{python}
-data = demo_data("y", "a", "b", "x1", "x2")
-data
+data = demo_data(
+  "y", "a", "b", "x1", "x2"
+)
 pd.DataFrame(data)
 ```
 :::
 
-::: {.column width='50%' .fragment}
+::: {.column width='65%' .fragment}
 ```{python}
 dmatrix("a + a:b + np.exp(x1)", data)
 ```
@@ -364,15 +368,15 @@ dmatrix("a + a:b + np.exp(x1)", data, return_type='dataframe')
 <br/>
 
 ::: {.small}
-| Code     | Description                                       | Example      |
-|:--------:|:--------------------------------------------------|:-------------|
+| Code     | Description                                       | Example                |
+|:--------:|:--------------------------------------------------|:-------------------------------|
 | `+`      | unions terms on the left and right                | `a+a` ⇒ `a` |
 | `-`      | removes terms on the right from terms on the left | `a+b-a` ⇒ `b` |
-|`:`       | constructs interactions between each term on the left and right | `(a+b):c` ⇒  `a:c + b:c`|
+|`:`       | constructs interactions between each term on the<br/>left and right | `(a+b):c` ⇒  `a:c + b:c`|
 | `*`      | short-hand for terms and their interactions       | `a*b` ⇒ `a + b + a:b` |
-| `/`      | short-hand for left terms and their interactions with right terms | `a/b` ⇒ `a + a:b` |
-| `I()`    | used for calculating arithmetic calculations      | `I(x1 + x2)` |
-| `Q()`    | used to quote column names, e.g. columns with spaces or symbols | `Q('bad name!')` |
+| `/`      | short-hand for left terms and their interactions with<br/>right terms | `a/b` ⇒ `a + a:b` |
+| `I()`    | used for arithmetic calculations                  | `I(x1 + x2)` |
+| `Q()`    | used to quote column names, e.g. columns with<br/>spaces or symbols | `Q('bad name!')` |
 | `C()`    | used for categorical data coding                  |  `C(a, Treatment('a2'))` |
 :::
 
@@ -439,7 +443,7 @@ dmatrix("x - (-0)", demo_data("x","y","z"))
 
 ## Design Info
 
-One of the keep features of the design matrix object is that it retains all the necessary details (including stateful transforms) that are necessary to apply to new data inputs (e.g. for prediction).
+One of the key features of the design matrix object is that it retains all the necessary details (including stateful transforms) that are necessary to apply to new data inputs (e.g. for prediction).
 
 ::: {.xsmall}
 ```{python}
@@ -518,7 +522,7 @@ Based on [`koaning/scikit-lego`](https://github.com/koaning/scikit-lego/commit/8
 
 ##
 
-::: {.xsmall}
+::: {.xxsmall}
 ```{python}
 df = pd.DataFrame({
   "y": [2, 2, 4, 4, 6], "x": [1, 2, 3, 4, 5],
@@ -528,15 +532,15 @@ X, y = df[["x", "a"]], df[["y"]].values
 ```
 :::
 
-:::: {.columns .xsmall}
-::: {.column width='50%'}
+:::: {.columns .xxsmall}
+::: {.column width='47%'}
 ```{python}
 pt = PatsyTransformer("x*a + np.log(x)")
 pt.fit_transform(X)
 ```
 :::
 
-::: {.column width='50%' .fragment}
+::: {.column width='53%' .fragment}
 ```{python}
 make_pipeline(
   PatsyTransformer("x*a + np.log(x)"),
@@ -566,7 +570,7 @@ import statsmodels.tsa.api as tsa
 
 . . .
 
-`statsmodels` uses slightly different terminology for refering to `y` (dependent / response) and `x`  (independent / explanatory) variables. Specifically it uses `endog` to refer to the `y` and `exog` to refer to the `x` variable(s).
+`statsmodels` uses slightly different terminology for refering to `y` (dependent / response) and `x`  (independent / explanatory) variables. Specifically it uses `endog` and `exog` to refer to `y` and `x` variable(s) respectively.
 
 This is particularly important when using the main API, less so when using the formula API.
 
@@ -610,11 +614,33 @@ model = sm.OLS(endog=y, exog=X)
 
 The error occurs because `X` contains mixed types - specifically we have categorical data columns which cannot be directly converted to a numeric dtype so we need to take care of the dummy coding for statsmodels (with this interface).
 
+. . .
+
+::: {.xsmall}
+```{python}
+#| error: true
+X_dc = pd.get_dummies(X)
+model = sm.OLS(endog=y, exog=X_dc)
+```
+
+```{python}
+X_dc.dtypes
+```
+:::
+
+. . .
 
 ::: {.xsmall}
 ```{python}
 X_dc = pd.get_dummies(X, dtype='int')
 model = sm.OLS(endog=y, exog=X_dc)
+```
+:::
+
+##
+
+::: {.xsmall}
+```{python}
 model
 np.array(dir(model))
 ```
@@ -633,9 +659,11 @@ print(res.summary())
 
 ## Formula interface
 
+::: {.small}
 Most of the modeling interfaces are also provided by `smf` (`statsmodels.formula.api`), in which case `patsy` is used to construct the model matrices.
+:::
 
-::: {.xsmall}
+::: {.tiny}
 ```{python}
 model = smf.ols(
   "loan_amount ~ homeownership + annual_income + debt_to_income + interest_rate + public_record_bankrupt",
@@ -692,7 +720,7 @@ plt.show()
 
 ## Alternative model
 
-::: {.xsmall}
+::: {.tiny}
 ```{python}
 res = smf.ols(
   "np.sqrt(loan_amount) ~ homeownership + annual_income + debt_to_income + interest_rate + public_record_bankrupt",
@@ -727,7 +755,9 @@ plt.show()
 
 ## Bushtail Possums
 
+::: {.small}
 > Data representing possums in Australia and New Guinea. This is a copy of the data set by the same name in the DAAG package, however, the data set included here includes fewer variables.
+:::
 
 :::: {.columns .xsmall}
 ::: {.column width='66%'}
@@ -782,7 +812,7 @@ print(res.summary())
 
 Note `endog` can be 1d or 2d for binomial models - in the case of the latter each row is interpreted as [success, failure].
 
-::: {.small}
+::: {.tiny}
 ```{python error=TRUE}
 y = pd.get_dummies( possum["pop"], dtype="int")
 X = pd.get_dummies( possum.drop(["site","pop"], axis=1), dtype="int")
@@ -795,7 +825,7 @@ print(res.summary())
 
 ## Formula interface
 
-::: {.small}
+::: {.tiny}
 ```{python}
 res = smf.glm(
   "pop ~ sex + age + head_l + skull_w + total_l + tail_l-1",
@@ -828,9 +858,9 @@ These data come from the `sleepstudy` dataset in the `lme4` R package
 
 ##
 
-::: {.small}
+::: {.xsmall}
 ```{python}
-g = sns.relplot(x="Days", y="Reaction", col="Subject", col_wrap=6, data=sleep)
+g = sns.relplot(x="Days", y="Reaction", col="Subject", col_wrap=6, data=sleep, height=2)
 ```
 :::
 
@@ -864,7 +894,7 @@ summary(
 
 ```{python echo=FALSE, out.width="90%"}
 pred = sleep.assign(pred = res_rand_int.predict())
-g = sns.FacetGrid(pred, col="Subject", col_wrap=6)
+g = sns.FacetGrid(pred, col="Subject", col_wrap=6, height=2)
 g = g.map(sns.scatterplot, "Days", "Reaction")
 g = g.map(sns.lineplot, "Days", "pred")
 plt.show()
@@ -904,7 +934,7 @@ Based on code provide on [Stack Overflow](https://stats.stackexchange.com/questi
 ```{python}
 #| echo: false
 pred = sleep.assign(pred = y_hat)
-g = sns.FacetGrid(pred, col="Subject", col_wrap=6)
+g = sns.FacetGrid(pred, col="Subject", col_wrap=6, height=2)
 g = g.map(sns.scatterplot, "Days", "Reaction")
 g = g.map(sns.lineplot, "Days", "pred")
 plt.show()
@@ -926,7 +956,7 @@ print(res_rand_sl.summary())
 
 ## lme4 version
 
-::: {.xsmall}
+::: {.xxsmall}
 ```{r}
 summary(
   lmer(Reaction ~ Days + (Days|Subject), data=sleepstudy)
@@ -949,7 +979,7 @@ rex = np.concatenate(rex)
 y_hat = res_rand_sl.predict() + rex
 
 pred = sleep.assign(pred = y_hat)
-g = sns.FacetGrid(pred, col="Subject", col_wrap=6)
+g = sns.FacetGrid(pred, col="Subject", col_wrap=6, height=2)
 g = g.map(sns.scatterplot, "Days", "Reaction")
 g = g.map(sns.lineplot, "Days", "pred")
 plt.show()
