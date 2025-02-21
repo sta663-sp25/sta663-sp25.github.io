@@ -1,10 +1,10 @@
 import pandas as pd
 import numpy as np
-
 import sklearn
-sklearn.set_config(display="text")
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted, validate_data, _check_feature_names
+
+sklearn.set_config(display="text")
 
 class interact_features(BaseEstimator, TransformerMixin):
   def __init__(self, interaction_only = False, include_intercept = False):

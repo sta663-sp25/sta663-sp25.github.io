@@ -1,5 +1,8 @@
 {
     "cSpell.words": [
+        "dmatrices",
+        "dmatrix",
+        "homeownership",
         "matplotlib",
         "numpy",
         "pyplot",
@@ -7,6 +10,10 @@
         "scipy",
         "seaborn",
         "SELU",
-        "sklearn"
+        "sklearn",
+        "sleepstudy",
+        "statsmodels",
+        "xsmall",
+        "xxsmall"
     ]
 }

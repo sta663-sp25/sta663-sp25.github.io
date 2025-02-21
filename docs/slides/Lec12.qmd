@@ -237,7 +237,7 @@ We employed a couple of special methods that are worth mentioning in a little mo
 
 * In general one or both is run during `fit()` with `reset=True` in which case the respective attribute will be set.
 
-* Later, in `tranform()` one or both will again be called with `reset=False` and the properties of `X` will be checked against the values in the attribute.
+* Later, in `transform()` one or both will again be called with `reset=False` and the properties of `X` will be checked against the values in the attribute.
 
 * These are worth using as they promote an interface consistent with sklearn and also provide convenient error checking with useful warning / error messages.
 
@@ -570,7 +570,7 @@ import statsmodels.tsa.api as tsa
 
 . . .
 
-`statsmodels` uses slightly different terminology for refering to `y` (dependent / response) and `x`  (independent / explanatory) variables. Specifically it uses `endog` and `exog` to refer to `y` and `x` variable(s) respectively.
+`statsmodels` uses slightly different terminology for referring to `y` (dependent / response) and `x`  (independent / explanatory) variables. Specifically it uses `endog` and `exog` to refer to `y` and `x` variable(s) respectively.
 
 This is particularly important when using the main API, less so when using the formula API.
 
