@@ -208,7 +208,7 @@ def newtons_method(
 
       res["njev"] += 1
       res["nhev"] += 1
-
+      
       t = 1
       for j in range(max_back):
         res["nfev"] += 2
@@ -222,7 +222,7 @@ def newtons_method(
 
       if np.sqrt(np.sum((x - res["x"][-1])**2)) < tol:
         break
-
+      
       res["x"].append(x)
       res["f"].append(f(x))
     
@@ -274,30 +274,29 @@ def conjugate_gradient(x, f, grad, hess, max_iter=100, tol=1e-8):
 
 ## Method: CG in scipy
 
-Scipy's optimize module implements the conjugate gradient algorithm by Polak and Ribiere, a variant that does not require the Hessian,
-
+Scipy's optimize module implements the conjugate gradient algorithm using a variant proposed by Polak and Ribiere, this version does not use the Hessian when calculating the next step. The specific changes are:
 
 * $\alpha_k$ is calculated via a line search along the direction $p_k$
 
-* We replace the previous definition
-$$
-\beta_{k+1} = \frac{ r^T_{k+1} \, \nabla^2 f(x_k)  \, p_{k} }{p_k^T \, \nabla^2 f(x_k) \, p_k}
-$$
-
-with
+* and the $\beta_{k+1}$ calculation is replaced as follows
 
 $$
+\beta_{k+1} = \frac{ r^T_{k+1} \, \nabla^2 f(x_k)  \, p_{k} }{p_k^T \, \nabla^2 f(x_k) \, p_k} 
+\qquad \Rightarrow \qquad
 \beta_{k+1}^{PR} = \frac{\nabla f(x_{k+1}) \left(\nabla f(x_{k+1}) - \nabla f(x_{k})\right)}{\nabla f(x_k)^T \, \nabla f(x_k)}
 $$
 
 
 ## Method: Newton-CG & BFGS
 
-These are both variants of Newtons method but do not require the Hessian (but can be use by the former if provided).
+These are both variants of Newton's method but do not require the Hessian (but can be used by the former if provided).
 
-* The Broyden-Fletcher-Goldfarb-Shanno (BFGS) algorithm is a quasi-newton which iteratively approximates Hessian
+* Newton-Conjugate Gradient (Netwon-CG) algorithm uses a conjugate gradient algorithm to (approximately) invert the local Hessian
 
-<FIXME>
+* The Broyden-Fletcher-Goldfarb-Shanno (BFGS) algorithm iteratively approximates the inverse Hessian
+
+    * Gradient is also not required and can similarly be approximated using finite differences
+    
 
 
 ## Method: Nelder-Mead
@@ -308,7 +307,7 @@ This is a gradient free method that uses a series of simplexes which are used to
 </iframe>
 
 ::: {.aside}
-This comes from [greg-rychlewski/nelder-mead](https://github.com/greg-rychlewski/nelder-mead)
+This js implementation comes from [greg-rychlewski/nelder-mead](https://github.com/greg-rychlewski/nelder-mead)
 :::
 
 
@@ -359,21 +358,16 @@ def define_methods(x, f, grad, hess, tol=1e-8):
 x = (1.6, 1.1)
 f, grad, hess = mk_quad(0.7)
 methods = define_methods(x, f, grad, hess)
-
 df = pd.DataFrame({
   key: timeit.Timer(methods[key]).repeat(10, 100) for key in methods
 })
-  
-df
 ```
 :::
 
-##
-
 ```{python}
 #| echo: false
-g = sns.catplot(data=df.melt(), y="variable", x="value", aspect=2)
-g.ax.set_xlabel("Time (100 iter)")
+g = sns.catplot(data=df.melt(), y="variable", x="value", aspect=1.8)
+g.ax.set_xlabel("Time (sec)")
 g.ax.set_ylabel("")
 plt.show()
 ```
@@ -382,9 +376,7 @@ plt.show()
 
 ::: {.xsmall}
 ```{python}
-#| output-location: column
 def time_cost_func(n, x, name, cost_func, *args):
-  x = (1.6, 1.1)  
   f, grad, hess = cost_func(*args)
   methods = define_methods(x, f, grad, hess)
   
@@ -398,13 +390,13 @@ def time_cost_func(n, x, name, cost_func, *args):
     .assign(cost_func = name)
   )
 
-df = pd.concat([
+x = (1.6, 1.1)  
+
+time_cost_df = pd.concat([
   time_cost_func(10, x, "Well-cond quad", mk_quad, 0.7),
   time_cost_func(10, x, "Ill-cond quad", mk_quad, 0.02),
   time_cost_func(10, x, "Rosenbrock", mk_rosenbrock)
 ])
-
-df
 ```
 :::
 
@@ -413,8 +405,8 @@ df
 
 ```{python}
 #| echo: false
-g = sns.catplot(data=df, y="variable", x="value", hue="cost_func", alpha=0.5, aspect=2)
-g.ax.set_xlabel("Time (10 iter)")
+g = sns.catplot(data=time_cost_df, y="variable", x="value", hue="cost_func", alpha=0.5, aspect=2)
+g.ax.set_xlabel("Time (sec)")
 g.ax.set_ylabel("")
 plt.show()
 ```
@@ -422,17 +414,17 @@ plt.show()
 
 ## Random starting locations
 
-:::: {.xsmall}
+:::: {.tiny}
 ```{python}
-x0s = np.random.default_rng(seed=1234).uniform(-2,2, (20,2))
+pts = np.random.default_rng(seed=1234).uniform(-2,2, (20,2))
 
 df = pd.concat([
   pd.concat([
-    time_cost_func(3, x0, "Well-cond quad", mk_quad, 0.7),
-    time_cost_func(3, x0, "Ill-cond quad", mk_quad, 0.02),
-    time_cost_func(3, x0, "Rosenbrock", mk_rosenbrock)
+    time_cost_func(3, x, "Well-cond quad", mk_quad, 0.7),
+    time_cost_func(3, x, "Ill-cond quad", mk_quad, 0.02),
+    time_cost_func(3, x, "Rosenbrock", mk_rosenbrock)
   ])
-  for x0 in x0s
+  for x in pts
 ])
 ```
 ::::
@@ -454,7 +446,8 @@ import cProfile
 
 f, grad, hess = mk_quad(0.7)
 def run():
-  optimize.minimize(fun = f, x0 = (1.6, 1.1), jac=grad, method="BFGS", tol=1e-11)
+  for i in range(500):
+    optimize.minimize(fun = f, x0 = (1.6, 1.1), jac=grad, method="BFGS", tol=1e-11)
 
 cProfile.run('run()', sort="tottime")
 ```
@@ -474,9 +467,14 @@ profiler.start()
 opt = optimize.minimize(fun = f, x0 = (1.6, 1.1), jac=grad, method="BFGS", tol=1e-11)
 p = profiler.stop()
 
-profiler.print(show_all=True)
+profiler.write_html("Lec14_bfgs_quad.html")
 ```
 :::
+
+##
+
+<iframe data-src="Lec14_bfgs_quad.html" width="100%" height="600px" style="border:1px solid;border-radius: 5px;" data-external="1">
+</iframe>
 
 
 
@@ -494,52 +492,63 @@ profiler.start()
 opt = optimize.minimize(fun = f, x0 = (1.6, 1.1), method="Nelder-Mead", tol=1e-11)
 p = profiler.stop()
 
-profiler.print(show_all=True)
+profiler.write_html("Lec14_nm_quad.html")
 ```
 :::
 
 
+##
+
+<iframe data-src="Lec14_nm_quad.html" width="100%" height="600px" style="border:1px solid;border-radius: 5px;" data-external="1">
+</iframe>
+
+
 ## `optimize.minimize()` output
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 f, grad, hess = mk_quad(0.7)
 ```
 :::
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
-optimize.minimize(fun = f, x0 = (1.6, 1.1), 
-                  jac=grad, method="BFGS")
+optimize.minimize(
+  fun = f, x0 = (1.6, 1.1), 
+  jac=grad, method="BFGS"
+)
 ```
 :::
 
 ::: {.column width='50%'}
 ```{python}
-optimize.minimize(fun = f, x0 = (1.6, 1.1), 
-                  jac=grad, hess=hess, 
-                  method="Newton-CG")
+optimize.minimize(
+  fun = f, x0 = (1.6, 1.1), 
+  jac=grad, hess=hess, method="Newton-CG"
+)
 ```
 :::
 ::::
 
 ## `optimize.minimize()` output (cont.)
 
-
-
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
-optimize.minimize(fun = f, x0 = (1.6, 1.1), 
-                  jac=grad, method="CG")
+optimize.minimize(
+  fun = f, x0 = (1.6, 1.1), 
+  jac=grad, method="CG"
+)
 ```
 :::
 
 ::: {.column width='50%'}
 ```{python}
-optimize.minimize(fun = f, x0 = (1.6, 1.1), 
-                  jac=grad, method="Nelder-Mead")
+optimize.minimize(
+  fun = f, x0 = (1.6, 1.1), 
+  jac=grad, method="Nelder-Mead"
+)
 ```
 :::
 ::::
@@ -547,7 +556,7 @@ optimize.minimize(fun = f, x0 = (1.6, 1.1),
 
 ## Collect
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
 def run_collect(name, x0, cost_func, *args, tol=1e-8, skip=[]):
@@ -559,7 +568,8 @@ def run_collect(name, x0, cost_func, *args, tol=1e-8, skip=[]):
     if method in skip: continue
     
     x = methods[method]()
-    
+    time = timeit.Timer(methods[method]).repeat(10, 25)
+
     d = {
       "name":    name,
       "method":  method,
@@ -567,8 +577,8 @@ def run_collect(name, x0, cost_func, *args, tol=1e-8, skip=[]):
       "nfev":    x["nfev"],
       "njev":    x.get("njev"),
       "nhev":    x.get("nhev"),
-      "success": x["success"]
-      #"message": x["message"]
+      "success": x["success"],
+      "time":    [time]
     }
     res.append( pd.DataFrame(d, index=[1]) )
   
@@ -579,30 +589,49 @@ def run_collect(name, x0, cost_func, *args, tol=1e-8, skip=[]):
 ::: {.column width='50%'}
 ```{python}
 df = pd.concat([
-  run_collect(name, (1.6, 1.1), cost_func, arg, skip=['naive_newton', 'naive_cg']) 
+  run_collect(
+    name, (1.6, 1.1), 
+    cost_func, 
+    arg, 
+    skip=['naive_newton', 'naive_cg']
+  ) 
   for name, cost_func, arg in zip(
     ("Well-cond quad", "Ill-cond quad", "Rosenbrock"), 
     (mk_quad, mk_quad, mk_rosenbrock), 
     (0.7, 0.02, None)
   )
 ])
-
-df
 ```
 :::
 ::::
 
 ##
 
+::: {.panel-tabset}
+
+### Runtimes
+
 ```{python}
 #| echo: false
-sns.catplot(
+g = sns.catplot(data=time_cost_df.query("variable != 'naive_newton' & variable != 'naive_cg'"), y="variable", x="value", hue="cost_func", alpha=0.5, aspect=2)
+g.ax.set_xlabel("Time (10 iter)")
+g.ax.set_ylabel("")
+plt.show()
+```
+
+### Function calls
+
+```{python}
+#| echo: false
+g = sns.catplot(
   y = "method", x = "value", hue = "variable", col="name", kind="bar",
   data = df.melt(id_vars=["name","method"], 
   value_vars=["nit", "nfev", "njev", "nhev"]).astype({"value": "float64"}),
   height=5, aspect=2./3.
 ).set_xlabels("n")
 ```
+
+:::
 
 
 ## Exercise 1
@@ -625,8 +654,8 @@ plot_2d_traj((-2,3), (-2,3), f)
 
 ## MVN density cost function
 
-:::: {.columns .small}
-::: {.column width='50%'}
+:::: {.columns}
+::: {.column width='50%' .small}
 
 For an $n$-dimensional multivariate normal we define <br/>
 the $n \times 1$ vectors $x$ and $\mu$ and the $n \times n$ <br/>
@@ -646,8 +675,7 @@ $$
 Our goal will be to find the mode (maximum) of this density.
 :::
 
-::: {.column width='50%'}
-
+::: {.column width='50%' .xsmall}
 ```{python}
 def mk_mvn(mu, Sigma):
   Sigma_inv = np.linalg.inv(Sigma)
@@ -657,7 +685,10 @@ def mk_mvn(mu, Sigma):
   def f(x):
     x_m = x - mu
     return -(norm_const * 
-      np.exp( -0.5 * (x_m.T @ Sigma_inv @ x_m).item() ))
+      np.exp( 
+        -0.5 * x_m.T @ Sigma_inv @ x_m
+      ) 
+    ).item()
   
   def grad(x):
     return (-f(x) * Sigma_inv @ (x - mu))
@@ -665,7 +696,11 @@ def mk_mvn(mu, Sigma):
   def hess(x):
     n = len(x)
     x_m = x - mu
-    return f(x) * ((Sigma_inv @ x_m).reshape((n,1)) @ (x_m.T @ Sigma_inv).reshape((1,n)) - Sigma_inv)
+    return f(x) * (
+      (Sigma_inv @ x_m).reshape((n,1)) 
+      @ (x_m.T @ Sigma_inv).reshape((1,n))
+      - Sigma_inv
+    )
   
   return f, grad, hess
 ```
@@ -684,18 +719,16 @@ One of the most common issues when implementing an optimizer is to get the gradi
 :::
 
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
-# 2d
-f, grad, hess = mk_mvn(np.zeros(2), np.eye(2,2))
-optimize.check_grad(f, grad, np.zeros(2))
-optimize.check_grad(f, grad, np.ones(2))
+# 5d
+f, grad, hess = mk_mvn(
+  np.zeros(5), np.eye(5,5)
+)
 ```
 
 ```{python}
-# 5d
-f, grad, hess = mk_mvn(np.zeros(5), np.eye(5,5))
 optimize.check_grad(f, grad, np.zeros(5))
 optimize.check_grad(f, grad, np.ones(5))
 ```
@@ -704,69 +737,91 @@ optimize.check_grad(f, grad, np.ones(5))
 ::: {.column width='50%'}
 ```{python}
 # 10d
-f, grad, hess = mk_mvn(np.zeros(10), np.eye(10))
-optimize.check_grad(f, grad, np.zeros(10))
-optimize.check_grad(f, grad, np.ones(10))
+f, grad, hess = mk_mvn(
+  np.zeros(10), np.eye(10)
+)
 ```
 
 ```{python}
-# 20d
-f, grad, hess = mk_mvn(np.zeros(20), np.eye(20))
-optimize.check_grad(f, grad, np.zeros(20))
-optimize.check_grad(f, grad, np.ones(20))
+optimize.check_grad(f, grad, np.zeros(10))
+optimize.check_grad(f, grad, np.ones(10))
 ```
 :::
 ::::
 
 ## Gradient checking (wrong gradient)
 
-::: {.small}
+::: {.xsmall}
 ```{python}
-wrong_grad = lambda x: 2*grad(x)
+wrong_grad = lambda x: 5*grad(x)
 ```
 :::
 
-:::: {.columns .small}
-::: {.column width='50%'}
-```{python}
-# 2d
-f, grad, hess = mk_mvn(np.zeros(2), np.eye(2,2))
-optimize.check_grad(f, wrong_grad, [0,0])
-optimize.check_grad(f, wrong_grad, [1,1])
-```
-:::
-
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
 # 5d
-f, grad, hess = mk_mvn(np.zeros(5), np.eye(5))
+f, grad, hess = mk_mvn(
+  np.zeros(5), np.eye(5)
+)
+```
+
+```{python}
 optimize.check_grad(f, wrong_grad, np.zeros(5))
 optimize.check_grad(f, wrong_grad, np.ones(5))
 ```
 :::
+
+::: {.column width='50%'}
+```{python}
+# 10d
+f, grad, hess = mk_mvn(
+  np.zeros(10), np.eye(10)
+)
+```
+
+```{python}
+optimize.check_grad(f, wrong_grad, np.zeros(10))
+optimize.check_grad(f, wrong_grad, np.ones(10))
+```
+:::
 ::::
+
+. . .
+
+<br/>
+
+::: {.center .large}
+Why does `np.ones()` detect an issue but `np.zeros()` does not?
+:::
 
 
 ## Hessian checking
 
-Note since the gradient of the gradient / jacobian is the hessian we can use this function to check our implementation of the hessian as well, just use `grad()` as `func` and `hess()` as `grad`.
+Note since the gradient of the gradient is the hessian we can use this function to check our implementation of the hessian as well, just use `grad()` as `func` and `hess()` as `grad`.
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
-# 2d
-f, grad, hess = mk_mvn(np.zeros(2), np.eye(2,2))
-optimize.check_grad(grad, hess, [0,0])
-optimize.check_grad(grad, hess, [1,1])
+# 5d
+f, grad, hess = mk_mvn(np.zeros(5), np.eye(5))
+```
+
+```{python}
+optimize.check_grad(grad, hess, np.zeros(5))
+optimize.check_grad(grad, hess, np.ones(5))
 ```
 :::
 
 ::: {.column width='50%'}
 ```{python}
-# 5d
-f, grad, hess = mk_mvn(np.zeros(5), np.eye(5))
-optimize.check_grad(grad, hess, np.zeros(5))
-optimize.check_grad(grad, hess, np.ones(5))
+# 10d
+f, grad, hess = mk_mvn(np.zeros(10), np.eye(10))
+```
+
+```{python}
+optimize.check_grad(grad, hess, np.zeros(10))
+optimize.check_grad(grad, hess, np.ones(10))
 ```
 :::
 ::::
@@ -774,212 +829,185 @@ optimize.check_grad(grad, hess, np.ones(5))
 
 ## Unit MVNs
 
-:::: {.columns .small}
-::: {.column width='50%'}
+::: {.xsmall}
 ```{python}
+rng = np.random.default_rng(seed=1234)
+runif = rng.uniform(-1,1, size=25)
+
 df = pd.concat([
   run_collect(
-    name, np.ones(n), mk_mvn, 
+    name, runif[:n], mk_mvn, 
     np.zeros(n), np.eye(n), 
     tol=1e-10, 
-    skip=['naive_newton', 'naive_cg', 'bfgs w/o G', 'newton-cg w/ H']
+    skip=['naive_newton', 'naive_cg', 'bfgs w/o G', 'newton-cg w/ H', 'l-bfgs-b', 'nelder-mead']
   ) 
   for name, n in zip(
-    ("5d", "10d", "20d", "30d"), 
-    (5, 10, 20, 30)
+    ("5d", "10d", "25d"), 
+    (5, 10, 25)
   )
 ])
 ```
 :::
-
-::: {.column width='50%'}
-```{python}
-df
-```
-:::
-::::
 
 ## Performance (Unit MVNs)
 
-```{python}
-#| echo: false
-sns.catplot(
-  y = "method", x = "value", hue = "variable", col="name", kind="bar",
-  col_wrap=2,
-  data = df.melt(
-    id_vars=["name","method"], 
-    value_vars=["nit", "nfev", "njev", "nhev"]).astype({"value": "float64"}
-  )
-).set_xlabels("n").set(xscale="log")
-```
+::: {.panel-tabset}
 
-
-## Adding correlation
-
-:::: {.columns .small}
-::: {.column width='50%'}
-```{python}
-def build_Sigma(n, corr=0.5):
-  S = np.full((n,n), corr)
-  np.fill_diagonal(S, 1)
-  return S
-
-df = pd.concat([
-  run_collect(
-    name, np.ones(n), mk_mvn, 
-    np.zeros(n), build_Sigma(n), 
-    tol=1e-10, 
-    skip=['naive_newton', 'naive_cg', 'bfgs w/o G', 'newton-cg w/ H']
-  ) 
-  for name, n in zip(
-    ("5d", "10d", "20d", "30d"), 
-    (5, 10, 20, 30)
-  )
-])
-```
-:::
-
-::: {.column width='50%'}
-```{python}
-df
-```
-:::
-::::
-
-##
-
-```{python}
-#| include: false
-plt.close("all")
-```
+### Run times
 
 ```{python}
 #| echo: false
-sns.catplot(
+g = sns.catplot(
+    data=(df[["name","method","time"]]
+        .explode("time")
+    ),
+    y="method", 
+    x="time", 
+    hue="name", 
+    alpha=0.5, 
+    aspect=2
+)
+g.ax.set_xlabel("Time (secs)")
+g.ax.set_ylabel("")
+plt.show()
+```
+
+### Function calls
+
+```{python}
+#| echo: false
+g = sns.catplot(
   y = "method", x = "value", hue = "variable", col="name", kind="bar",
-  col_wrap=2,
+  col_wrap=3,
   data = df.melt(
     id_vars=["name","method"], 
     value_vars=["nit", "nfev", "njev", "nhev"]).astype({"value": "float64"}
-  )
+  ),
+  aspect=0.75
 ).set_xlabels("n").set(xscale="log")
 ```
+
+:::
+
+
 
 ## What's going on? (good)
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 n = 5
-f, grad, hess = mk_mvn(np.zeros(n), build_Sigma(n))
+f, grad, hess = mk_mvn(np.zeros(n), np.eye(n))
 ```
 :::
 
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
-optimize.minimize(f, np.ones(n), jac=grad, 
-                  method="CG", tol=1e-9)
+optimize.minimize(
+  f, runif[:n], jac=grad, 
+  method="newton-cg", tol=1e-10
+)
 ```
 :::
 
-::: {.column width='50%' .fragment}
+::: {.column width='50%'}
 ```{python}
-optimize.minimize(f, np.ones(n), jac=grad, 
-                  method="CG", tol=1e-10)
+optimize.minimize(
+  f, runif[:n], jac=grad, 
+  method="bfgs", tol=1e-10
+)
 ```
 :::
 ::::
 
-. . .
-
-:::: {.columns .small}
-::: {.column width='50%'}
-```{python}
-optimize.minimize(f, np.ones(n), jac=grad, 
-                  method="CG", tol=1e-11)
-```
-:::
-::::
 
 ## What's going on? (okay)
 
-::: {.small}
+::: {.xsmall}
 ```{python}
-n = 20
-f, grad, hess = mk_mvn(np.zeros(n), build_Sigma(n))
+n = 10
+f, grad, hess = mk_mvn(np.zeros(n), np.eye(n))
 ```
 :::
 
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
-optimize.minimize(f, np.ones(n), jac=grad, 
-                  method="CG", tol=1e-9)
+optimize.minimize(
+  f, runif[:n], jac=grad, 
+  method="newton-cg", tol=1e-10
+)
 ```
 :::
 
-::: {.column width='50%' .fragment}
+::: {.column width='50%'}
 ```{python}
-optimize.minimize(f, np.ones(n), jac=grad, 
-                  method="CG", tol=1e-10)
+optimize.minimize(
+  f, runif[:n], jac=grad, 
+  method="bfgs", tol=1e-10
+)
 ```
 :::
 ::::
 
-. . .
-
-:::: {.columns .small}
-::: {.column width='50%'}
-```{python}
-optimize.minimize(f, np.ones(n), jac=grad, 
-                  method="CG", tol=1e-11)
-```
-:::
-::::
 
 ## What's going on? (bad)
 
-::: {.small}
+::: {.xsmall}
 ```{python}
-n = 30
-f, grad, hess = mk_mvn(np.zeros(n), build_Sigma(n))
+n = 25
+f, grad, hess = mk_mvn(np.zeros(n), np.eye(n))
 ```
 :::
 
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
-optimize.minimize(f, np.ones(n), jac=grad, 
-                  method="CG", tol=1e-9)
+optimize.minimize(
+  f, runif[:n], jac=grad, 
+  method="newton-cg", tol=1e-10
+)
 ```
 :::
 
-::: {.column width='50%' .fragment}
+::: {.column width='50%'}
 ```{python}
-optimize.minimize(f, np.ones(n), jac=grad, 
-                  method="CG", tol=1e-10)
+optimize.minimize(
+  f, runif[:n], jac=grad, 
+  method="bfgs", tol=1e-10
+)
 ```
 :::
 ::::
 
-. . .
 
-:::: {.columns .small}
-::: {.column width='50%'}
+## All bad?
+
+::: {.xsmall}
 ```{python}
-optimize.minimize(f, np.ones(n), jac=grad, 
-                  method="CG", tol=1e-11)
+optimize.minimize(
+  f, runif[:n], jac=grad, 
+  method="nelder-mead", tol=1e-10
+)
 ```
 :::
-::::
 
+
+
+## Options (newton-cg)
+
+::: {.xsmall}
+```{python}
+optimize.show_options(solver="minimize", method="newton-cg")
+```
+:::
 
 ## Options (bfgs)
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 optimize.show_options(solver="minimize", method="bfgs")
 ```
@@ -987,9 +1015,9 @@ optimize.show_options(solver="minimize", method="bfgs")
 
 ## Options (Nelder-Mead)
 
-::: {.small}
+::: {.xsmall}
 ```{python}
-optimize.show_options(solver="minimize", method="Nelder-Mead")
+optimize.show_options(solver="minimize", method="newton-cg")
 ```
 :::
 
@@ -1026,6 +1054,192 @@ if tol is not None:
 See code in context on GitHub [here](https://github.com/scipy/scipy/blob/a438ba6ef4061c28d79657b525ed2378154dfea8/scipy/optimize/_minimize.py#L610-L627)
 :::
 
+
+
+## Fixing our tolerances?
+
+::: {.xsmall}
+```{python}
+n = 25
+f, grad, hess = mk_mvn(np.zeros(n), np.eye(n))
+```
+:::
+
+
+:::: {.columns .xsmall}
+::: {.column width='50%'}
+```{python}
+optimize.minimize(
+  f, runif[:n], jac=grad, 
+  method="newton-cg", tol=1e-16
+)
+```
+:::
+
+::: {.column width='50%'}
+```{python}
+optimize.minimize(
+  f, runif[:n], jac=grad, 
+  method="bfgs", tol=1e-16
+)
+```
+:::
+::::
+
+
+## Limits of floating point precision
+
+Every type of floating point value has finite precision due to the limitations of how it is represented. This value is typically refered to as the machine epsilon value, this is the smallest possible spacing between 1.0 and the next representable floating-point number.
+
+:::: {.columns .small}
+::: {.column width='50%'}
+```{python}
+np.finfo(np.float64).eps
+np.finfo(np.float32).eps
+np.finfo(np.float16).eps
+```
+
+:::
+
+::: {.column width='50%'}
+```{python}
+1+np.finfo(np.float64).eps > 1
+1+np.finfo(np.float64).eps/2 > 1
+```
+:::
+::::
+
+
+## Fixes?
+
+::: {.xsmall}
+```{python}
+def mk_prop_mvn(mu, Sigma):
+  Sigma_inv = np.linalg.inv(Sigma)
+  #norm_const = 1 / (np.sqrt(np.linalg.det(2*np.pi*Sigma)))
+  norm_const = 1
+  
+  # Returns the negative density (since we want the max not min)
+  def f(x):
+    x_m = x - mu
+    return -(norm_const * 
+      np.exp( 
+        -0.5 * x_m.T @ Sigma_inv @ x_m
+      ) 
+    ).item()
+  
+  def grad(x):
+    return (-f(x) * Sigma_inv @ (x - mu))
+  
+  def hess(x):
+    n = len(x)
+    x_m = x - mu
+    return f(x) * (
+      (Sigma_inv @ x_m).reshape((n,1)) 
+      @ (x_m.T @ Sigma_inv).reshape((1,n))
+      - Sigma_inv
+    )
+  
+  return f, grad, hess
+```
+:::
+
+## 
+
+::: {.xsmall}
+```{python}
+n = 25
+f, grad, hess = mk_prop_mvn(np.zeros(n), np.eye(n))
+```
+:::
+
+
+:::: {.columns .xsmall}
+::: {.column width='50%'}
+```{python}
+optimize.minimize(
+  f, runif[:n], jac=grad, 
+  method="newton-cg", tol=1e-10
+)
+```
+:::
+
+::: {.column width='50%'}
+```{python}
+optimize.minimize(
+  f, runif[:n], jac=grad, 
+  method="bfgs", tol=1e-10
+)
+```
+:::
+::::
+
+
+## Performance 
+
+```{python}
+#| include: false
+rng = np.random.default_rng(seed=1234)
+runif = rng.uniform(-1,1, size=25)
+
+df = pd.concat([
+  run_collect(
+    name, runif[:n], mk_prop_mvn, 
+    np.zeros(n), np.eye(n), 
+    tol=1e-10, 
+    skip=['naive_newton', 'naive_cg', 'bfgs w/o G', 'newton-cg w/ H', 'l-bfgs-b', 'nelder-mead']
+  ) 
+  for name, n in zip(
+    ("5d", "10d", "25d"), 
+    (5, 10, 25)
+  )
+])
+```
+
+
+::: {.panel-tabset}
+
+### Run times
+
+```{python}
+#| echo: false
+g = sns.catplot(
+    data=(df[["name","method","time"]]
+        .explode("time")
+    ),
+    y="method", 
+    x="time", 
+    hue="name", 
+    alpha=0.5, 
+    aspect=2
+)
+g.ax.set_xlabel("Time (secs)")
+g.ax.set_ylabel("")
+plt.show()
+```
+
+### Function calls
+
+```{python}
+#| echo: false
+g = sns.catplot(
+  y = "method", x = "value", hue = "variable", col="name", kind="bar",
+  col_wrap=3,
+  data = df.melt(
+    id_vars=["name","method"], 
+    value_vars=["nit", "nfev", "njev", "nhev"]).astype({"value": "float64"}
+  ),
+  aspect=0.75
+).set_xlabels("n").set(xscale="log")
+```
+
+:::
+
+
+
+
+
+
 ## Some general advice
 
 * Having access to the gradient is almost always helpful / necessary
@@ -1045,27 +1259,28 @@ See code in context on GitHub [here](https://github.com/scipy/scipy/blob/a438ba6
 
 ## Normal MLE
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
 from scipy.stats import norm
 
 n = norm(-3.2, 1.25)
 x = n.rvs(size=100, random_state=1234)
-x.round(2)
 {'µ': x.mean(), 'σ': x.std()}
+```
+```{python}
+mle_norm = lambda θ: -np.sum(
+  norm.logpdf(x, loc=θ[0], scale=θ[1])
+)
 ```
 :::
 
 ::: {.column width='50%' .fragment}
 ```{python}
-mle_norm = lambda θ: -np.sum(
-  norm.logpdf(x, loc=θ[0], scale=θ[1])
-)
-
 mle_norm([0,1])
 mle_norm([-3, 1])
 mle_norm([-3.2, 1.25])
+mle_norm([-3.3, 1.25])
 ```
 :::
 ::::
@@ -1073,20 +1288,24 @@ mle_norm([-3.2, 1.25])
 
 ## Minimizing
 
+::: {.small}
 ```{python}
 optimize.minimize(mle_norm, x0=[0,1], method="bfgs")
 ```
+:::
 
 ## Adding constraints
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
 def mle_norm2(θ): 
   if θ[1] <= 0:
     return np.inf
   else:
-    return -np.sum(norm.logpdf(x, loc=θ[0], scale=θ[1]))
+    return -np.sum(
+      norm.logpdf(x, loc=θ[0], scale=θ[1])
+    )
 ```
 :::
 
@@ -1097,10 +1316,18 @@ optimize.minimize(mle_norm2, x0=[0,1], method="bfgs")
 :::
 ::::
 
+. . .
+
+::: {.xsmall}
+```{python}
+{'µ': x.mean(), 'σ': x.std()}
+```
+:::
+
 
 ## Specifying Bounds
 
-It is also possible to specify bounds via `bounds` but this is only available for certain optimization methods.
+It is also possible to specify bounds via `bounds` but this is only available for certain optimization methods (i.e. Nelder-Mead & L-BFGS-B).
 
 ::: {.small}
 ```{python}

@@ -175,7 +175,7 @@ schedule:
 - week: 7
   day: 5
   lecture: "optimization (cont.)"
-  slides: 
+  slides: Lec14
   screencast: 
   readings:
   notes: 
