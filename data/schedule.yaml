@@ -182,10 +182,12 @@ schedule:
 
 - week: 8
   day: 3
-  lecture: "optimization (cont.)"
-  slides: 
+  lecture: "optimization - SGD"
+  slides: Lec15
   screencast: 
   readings:
+  - text: Probabilistic Machine Learning - Chp 8
+    link: https://probml.github.io/pml-book/book1.html
   notes: 
 
 - week: 8
