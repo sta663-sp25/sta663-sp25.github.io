@@ -74,10 +74,11 @@ local({
 
 # Stochastic Gradient Descent
 
-## A regression examples
+## A regression example
 
 ::: {.xsmall}
 ```{python}
+#| code-line-numbers: "|3"
 from sklearn.datasets import make_regression
 X, y, coef = make_regression(
   n_samples=200, n_features=20, n_informative=4, 
@@ -108,10 +109,13 @@ coef
 
 ::: {.xsmall}
 ```{python}
+#| code-line-numbers: "|11"
 def grad_desc_lm(X, y, beta, step, max_step=50):
   X = jnp.c_[jnp.ones(X.shape[0]), X]
+  n, k = X.shape
+
   f = lambda beta: jnp.sum((y - X @ beta)**2)
-  grad = jax.grad(f)
+  grad = lambda beta: 2*X.T @ (X@beta - y)
   
   res = {"x": [beta], "loss": [f(beta).item()], "iter": [0]}
   
@@ -143,7 +147,7 @@ np.r_[lm.intercept_, lm.coef_]
 ```{python}
 gd_lm = grad_desc_lm(
   X, y, np.zeros(X.shape[1]+1), 
-  step = 0.001, max_step=25
+  step = 0.001, max_step=20
 )
 gd_lm["x"][-1]
 ```
@@ -168,9 +172,9 @@ Lets take a quick look at the linear regression loss function and gradient desce
 
 $$
 \begin{aligned}
-f(\boldsymbol{\beta}) &=  (y - \boldsymbol{X} \boldsymbol{\beta})^T (y - \boldsymbol{X} \boldsymbol{\beta}) \\
+f(\underset{k\times 1}{\boldsymbol{\beta}}) &=  (\underset{n \times 1}{y} - \underset{n\times k}{\boldsymbol{X}} \, \underset{k \times 1}{\boldsymbol{\beta}})^T (\underset{n \times 1}{y} - \underset{n\times k}{\boldsymbol{X}} \, \underset{k \times 1}{\boldsymbol{\beta}}) \\
 \\
-\nabla f(\boldsymbol{\beta}) &= 2 \boldsymbol{X}^T(\boldsymbol{X}\boldsymbol{\beta} - \boldsymbol{y})\\
+\nabla f(\underset{k\times 1}{\boldsymbol{\beta}}) &= \underset{k\times n}{2 \boldsymbol{X}^T}(\underset{n \times k}{\boldsymbol{X}}\,\underset{k\times 1}{\boldsymbol{\beta}} - \underset{n \times 1}{\boldsymbol{y}})\\
 %&= 
 %\left[ 
 %  \begin{matrix}
@@ -191,9 +195,18 @@ What are the costs of calculating the loss function and gradient respectively in
 
 . . .
 
+::: {.columns}
+::: {.column width=20%}
+:::
+::: {.column width=60%}
 * Calculating the loss costs ${O}(nk)$ 
 
 * Calculating the gradient costs ${O}(n^2k)$
+:::
+::: {.column width=20%}
+:::
+:::
+
 
 
 ## Stochastic Gradient Descent
@@ -204,7 +217,7 @@ This is a variant of gradient descent where rather than using all $n$ data point
 
 * Will take more steps to converge but each step is now cheaper to compute
 
-* SGD has slower asymptotic convergence than GD, but is often faster in practice
+* SGD has slower asymptotic convergence than GD, but is often faster in practice in terms of runtime
 
 * Generally requires the learning rate to shrink as a function of iteration to guarantee convergence
 
@@ -213,6 +226,7 @@ This is a variant of gradient descent where rather than using all $n$ data point
 
 ::: {.xsmall}
 ```{python}
+#| code-line-numbers: "|11-15|4,17,18|"
 def sto_grad_desc_lm(X, y, beta, step, max_step=50, seed=1234, replace=True):
   X = jnp.c_[jnp.ones(X.shape[0]), X]
   f = lambda beta: jnp.sum((y - X @ beta)**2)
@@ -251,21 +265,21 @@ np.r_[lm.intercept_, lm.coef_]
 ```{python}
 sgd_lm_rep = sto_grad_desc_lm(
   X, y, np.zeros(X.shape[1]+1), 
-  step = 0.001, max_step=25, replace=True
+  step = 0.001, max_step=20, replace=True
 )
 sgd_lm_rep["x"][-1]
 ```
 ```{python}
 sgd_lm_worep = sto_grad_desc_lm(
   X, y, np.zeros(X.shape[1]+1), 
-  step = 0.001, max_step=25, replace=False
+  step = 0.001, max_step=20, replace=False
 )
 sgd_lm_worep["x"][-1]
 ```
 :::
 
 
-##
+## Learning by iteration
 
 ```{python}
 #| echo: false
@@ -275,14 +289,14 @@ plt.plot("iter", "loss", data=sgd_lm_rep, label="SGD - replacement")
 plt.plot("iter", "loss", data=sgd_lm_worep, label="SGD - w/o replacement")
 plt.yscale("log")
 plt.legend()
-plt.xlabel("Step")
+plt.xlabel("iter")
 plt.ylabel("Loss")
 plt.show()
 ```
 
-## Using Epochs
+## Learning by Epochs
 
-Generally, rather than thinking in steps we use epochs instead - an epoch is one complete pass through the data.
+Generally, rather than thinking in iterations we use epochs instead - an epoch is one complete pass through the data.
 
 ```{python}
 #| echo: false
@@ -355,7 +369,11 @@ sgd_lm_worep["x"][-1]
 :::
 
 
-## 
+## Results
+
+::: {.panel-tabset} 
+
+### Full
 
 ```{python}
 #| echo: false
@@ -378,6 +396,32 @@ plt.legend()
 plt.show()
 ```
 
+### Zoom
+
+```{python}
+#| echo: false
+plt.figure()
+plt.plot("iter", "loss", data=gd_lm, label="GD")
+plt.plot(
+  "iter", "loss", 
+  data=pd.DataFrame(sgd_lm_rep).assign(iter = lambda x: x.iter / X.shape[0]), 
+  label="SGD - replacement"
+)
+plt.plot(
+  "iter", "loss", 
+  data=pd.DataFrame(sgd_lm_worep).assign(iter = lambda x: x.iter / X.shape[0]), 
+  label="SGD - w/o replacement"
+)
+plt.yscale("log")
+plt.xlabel("Epoch")
+plt.ylabel("Loss")
+lim = plt.xlim(0,0.3)
+plt.legend()
+plt.show()
+```
+
+:::
+
 
 ## Mini batch gradient descent
 
@@ -387,10 +431,13 @@ This is a further variant of stochastic gradient descent where a mini batch of $
 
 * More updates per epoch than GD, but less than SGD
 
+* Mini batch composition can be constructed by sampling data points with or without replacement
+
 ## MBGD - Linear Regression
 
 ::: {.xsmall}
 ```{python}
+#| code-line-numbers: "|4|11-15|17|18,4"
 def mb_grad_desc_lm(X, y, beta, step, batch_size = 10, max_step=50, seed=1234, replace=True):
   X = jnp.c_[jnp.ones(X.shape[0]), X]
   f = lambda beta: jnp.sum((y - X @ beta)**2)
@@ -501,10 +548,10 @@ for size in sizes:
     data=pd.DataFrame(mbgd[size]).assign(iter = lambda x: x.iter / (X.shape[0]/size)), 
     label=f"MBGD ({size})"
   )
-#plt.yscale("log")
+plt.yscale("log")
 plt.xlabel("Epoch")
 plt.ylabel("Loss")
-plt.xlim(0,0.125)
+lim = plt.xlim(0,0.125)
 plt.legend()
 plt.show()
 ```
@@ -593,7 +640,7 @@ $$
 \end{aligned}
 $$
 
-where $\epsilon$ is a small constant (i.e. $10^{-8}$) to avoid division by zero.
+here $\epsilon$ is a small constant (i.e. $10^{-7}$) to avoid division by zero.
 
 
 ## Implementation
@@ -667,7 +714,7 @@ algos = ["AdaGrad - SGD", "AdaGrad - MBGD (25)", "AdaGrad - MBGD (50)", "AdaGrad
 
 adagrad = { size: adagrad_lm(
                     X, y, np.zeros(X.shape[1]+1), batch_size=size,
-                    step = lr, max_step=15, replace=False
+                    step = lr, max_step=7, replace=True, eps=1e-8
                   )
             for size, lr in zip(sizes,lrs) }
 ```
@@ -712,7 +759,7 @@ $$
 \boldsymbol{s}_0 = \boldsymbol{0}
 $$
 
-in practice a value of $\beta \approx 0.9$ is used.
+in practice a value of $\beta \approx 0.9$ is often used.
 
 
 ## Implementation
@@ -763,7 +810,7 @@ algos = ["RMSProp - SGD", "RMSProp - MBGD (25)", "RMSProp - MBGD (50)", "RMSProp
 
 rmsprop = { size: rmsprop_lm(
                     X, y, np.zeros(X.shape[1]+1), batch_size=size,
-                    step = lr, max_step=25, replace=False
+                    step = lr, max_step=25, replace=True
                   )
             for size, lr in zip(sizes,lrs) }
 ```
@@ -837,8 +884,8 @@ One small alteration that was suggested by the original others and is commonly u
 
 $$
 \begin{aligned}
-\hat{\boldsymbol{m}}_t &= \boldsymbol{m} / (1-{\beta_1}^t) \\
-\hat{\boldsymbol{s}}_t &=\boldsymbol{s}_t / (1-{\beta_2}^t) \\
+{\hat{\boldsymbol{m}}}_t &= \boldsymbol{m}_t / (1-{\beta_1}^t) \\
+{\hat{\boldsymbol{s}}}_t &=\boldsymbol{s}_t / (1-{\beta_2}^t) \\
 \end{aligned}
 $$
 
@@ -846,7 +893,7 @@ $$
 
 ::: {.xsmall}
 ```{python}
-#| code-line-numbers: ""
+#| code-line-numbers: "|10-12|22-25|27,28|30"
 def adam_lm(X, y, beta, step=0.001, batch_size = 10, max_step=50, seed=1234, replace=True, eps=1e-6, b1=0.9, b2=0.999):
   X = jnp.c_[jnp.ones(X.shape[0]), X]
   f = lambda beta: jnp.sum((y - X @ beta)**2)
@@ -880,7 +927,7 @@ def adam_lm(X, y, beta, step=0.001, batch_size = 10, max_step=50, seed=1234, rep
       
       res["x"].append(beta)
       res["loss"].append(f(beta).item())
-      res["iter"].append(res["iter"][-1]+1)
+      res["iter"].append(t)
     
   return res
 
@@ -897,7 +944,7 @@ algos = ["Adam - SGD", "Adam - MBGD (25)", "Adam - MBGD (50)", "Adam - GD"]
 
 adam = { size: adam_lm(
                  X, y, np.zeros(X.shape[1]+1), batch_size=size,
-                 step=lr, max_step=25, replace=False
+                 step=lr, max_step=25, replace=True
                )
          for size, lr in zip(sizes,lrs) }
 ```
