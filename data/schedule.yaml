@@ -192,10 +192,14 @@ schedule:
 
 - week: 8
   day: 5
-  lecture: "optimization (cont.)"
-  slides: 
+  lecture: "optimization - optax"
+  slides: Lec16
   screencast: 
   readings:
+  - text: Deep Learning Tuning Playbook
+    link: https://github.com/google-research/tuning_playbook
+  - text: Descending through a Crowded Valley
+    link: https://proceedings.mlr.press/v139/schmidt21a
   notes: 
 
 - week: 9
