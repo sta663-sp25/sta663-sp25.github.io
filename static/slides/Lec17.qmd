@@ -34,6 +34,14 @@ np.set_printoptions(
   #formatter=dict(float=lambda x: "%.5g" % x)
 )
 
+import torch
+
+torch.set_printoptions(
+  edgeitems=30, linewidth=200,
+  precision = 5
+)
+
+
 pd.set_option("display.width", 130)
 pd.set_option("display.max_columns", 10)
 pd.set_option("display.precision", 6)
@@ -413,9 +421,12 @@ y
 :::
 
 ::: {.column width='33.3%'}
-```{python error=TRUE}
+```{python}
 x = torch.zeros(3, 2)
 y = x.t()
+```
+```{python}
+#| error: true
 x.view(6)
 y.view(6)
 ```
@@ -440,6 +451,8 @@ The `squeeze()` and `unsqueeze()` methods can be used to remove or add length 1 
 ::: {.column width='50%'}
 ```{python}
 x = torch.zeros(1,3,1)
+```
+```{python}
 x.squeeze().shape
 x.squeeze(0).shape
 x.squeeze(1).shape
@@ -450,6 +463,8 @@ x.squeeze(2).shape
 ::: {.column width='50%' .fragment}
 ```{python}
 x = torch.zeros(3,2)
+```
+```{python}
 x.unsqueeze(0).shape
 x.unsqueeze(1).shape
 x.unsqueeze(2).shape
@@ -580,7 +595,7 @@ In context you can interpret `x.grad` and `m.grad` as the gradient of `y` with r
 
 ## High-level autograd API
 
-This allows for the automatic calculation and evaluation of the jacobian and hessian for a function defined using tensors.
+allows for the automatic calculation and evaluation of the jacobian and hessian for a function defined using tensors.
 
 ::: {.small}
 ```{python}
@@ -617,9 +632,8 @@ torch.autograd.functional.hessian(f, inputs)
 
 ## A basic model
 
-::: {.xsmall}
+::: {.xxsmall}
 ```{python}
-#| output-location: column
 x = np.linspace(-math.pi, math.pi, 50)
 y = np.sin(x)
 
@@ -634,7 +648,7 @@ print(lm.summary())
 
 ## Predictions
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 plt.figure(figsize=(10,5), layout="constrained")
 plt.plot(x, y, ".b", label="sin(x)")
@@ -654,26 +668,17 @@ yt = torch.tensor(y)
 Xt = torch.tensor(lm.model.exog)
 bt = torch.randn((Xt.shape[1], 1), dtype=torch.float64, requires_grad=True)
 ```
-:::
 
-:::: {.columns .small .limit200}
-::: {.column width='50%'}
 ```{python}
-yt
+yt.shape
+Xt.shape
+bt.shape
 ```
 :::
 
-::: {.column width='50%'}
-```{python}
-Xt
-```
-:::
-::::
+. . .
 
-
-##
-
-::: {.small}
+::: {.xsmall}
 ```{python}
 yt_pred = (Xt @ bt).squeeze()
 ```
@@ -681,7 +686,7 @@ yt_pred = (Xt @ bt).squeeze()
 
 . . .
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 loss = (yt_pred - yt).pow(2).sum()
 loss.item()
@@ -726,7 +731,7 @@ Xt = torch.tensor(lm.model.exog)
 bt = torch.randn((Xt.shape[1], 1), dtype=torch.float64, requires_grad=True)
 
 learning_rate = 1e-5
-for i in range(5000):
+for i in range(5001):
   
   yt_pred = Xt @ bt
   
@@ -774,9 +779,9 @@ plt.show()
 
 # Demo 2 - Using a torch model
 
-## A sample model
+## A simple model
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 class Model(torch.nn.Module):
     def __init__(self, beta):
@@ -877,7 +882,7 @@ class Model(torch.nn.Module):
     def fit(self, opt, n=1000, loss_fn = torch.nn.MSELoss()):
       losses = []
       for i in range(n):
-          loss = loss_fn(self(self.X).squeeze(), self.y.squeeze())
+          loss = loss_fn(self.forward(self.X).squeeze(), self.y.squeeze())
           loss.backward()
           opt.step()
           opt.zero_grad()
@@ -899,7 +904,7 @@ for lr in [1e-3, 1e-4, 1e-5, 1e-6]:
   opt = torch.optim.SGD(m.parameters(), lr=lr)
   losses = m.fit(opt, n=10000)
   
-  plt.plot(losses, label=f"lr = {lr}")
+  plt.plot(losses, label=f"{lr=}")
 
 plt.legend()
 plt.show()
@@ -909,21 +914,21 @@ plt.show()
 
 ## Momentum and convergence
 
-::: {.columns .small}
+::: {.columns .xsmall}
 ```{python}
 #| output-location: column-fragment
 plt.figure(figsize=(8,6), layout="constrained")
 
-for mt in [0, 0.1, 0.25, 0.5, 0.75, 0.9, 0.99]:
+for momentum in [0, 0.1, 0.25, 0.5, 0.75, 0.9, 0.99]:
   m = Model(X, y)
   opt = torch.optim.SGD(
     m.parameters(), 
     lr = 1e-4, 
-    momentum = mt
+    momentum = momentum
   )
   losses = m.fit(opt, n=10000)
   
-  plt.plot(losses, label=f"momentum = {mt}")
+  plt.plot(losses, label=f"{momentum=}")
 
 plt.legend()
 plt.show()
@@ -933,7 +938,7 @@ plt.show()
 
 ## Optimizers and convergence
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 #| output-location: column-fragment
 plt.figure(figsize=(8,6), layout="constrained")
@@ -947,7 +952,7 @@ for opt_fn in opts:
   opt = opt_fn(m.parameters(), lr=1e-4)
   losses = m.fit(opt, n=10000)
   
-  plt.plot(losses, label=f"opt = {opt_fn}")
+  plt.plot(losses, label=f"{opt_fn=}")
 
 plt.legend()
 plt.show()
