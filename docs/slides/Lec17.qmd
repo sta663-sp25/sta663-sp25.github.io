@@ -339,6 +339,11 @@ which of the above could be multiplied together and produce a valid result via b
 Explain why or why not broadcasting was able to be applied in each case.
 
 
+```{r}
+countdown::countdown(5)
+```
+
+
 ## Inplace modification
 
 In instances where we need to conserve memory it is possible to apply many functions such that a new tensor is not created but the original value(s) are replaced. These functions share the same name with the original functions but have a `_` suffix.
@@ -492,6 +497,10 @@ c = torch.rand(5,3)
 ```
 
 what reshaping is needed to make it possible so that `a * b` and `a * c` can be calculated via broadcasting?
+
+```{r}
+countdown::countdown(3)
+```
 
 
 # Autograd
