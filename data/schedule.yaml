@@ -214,40 +214,12 @@ schedule:
   day: 5
   lecture: "<i>No lecture (Spring recess)</i>"
 
+
+
 - week: 10
   day: 3
-  lecture: "MCMC"
-  slides: 
-  screencast: 
-  readings:
-  - text: PyMC introduction
-    link: https://www.pymc.io/projects/docs/en/stable/learn/core_notebooks/pymc_overview.html#pymc-overview
-  - text: ArviZ user guide
-    link: https://python.arviz.org/en/stable/user_guide/index.html
-
-- week: 10
-  day: 5
-  lecture: "MCMC (cont.)"
-  slides: 
-  screencast: 
-  readings:
-  notes: 
-
-- week: 11
-  day: 3
-  lecture: "MCMC (cont.)"
-  slides: 
-  screencast: 
-  readings:
-  notes: 
-
-
-
-
-- week: 11
-  day: 5
   lecture: "torch - Intro"
-  slides: 
+  slides: Lec17
   screencast: 
   readings:
   - text: Intro to PyTorch Tensors
@@ -257,8 +229,8 @@ schedule:
   notes: 
 
 
-- week: 12
-  day: 3
+- week: 10
+  day: 5
   lecture: "torch - nn"
   slides: 
   screencast: 
@@ -269,13 +241,43 @@ schedule:
     link: https://www.deeplearningwizard.com/deep_learning/practical_pytorch/pytorch_convolutional_neuralnetwork/
   notes: 
   
-- week: 12
-  day: 5
+- week: 11
+  day: 3
   lecture: "torch - gpu"
   slides: 
   screencast: 
   readings:
   notes: 
+
+
+
+- week: 11
+  day: 5
+  lecture: "MCMC"
+  slides: 
+  screencast: 
+  readings:
+  - text: PyMC introduction
+    link: https://www.pymc.io/projects/docs/en/stable/learn/core_notebooks/pymc_overview.html#pymc-overview
+  - text: ArviZ user guide
+    link: https://python.arviz.org/en/stable/user_guide/index.html
+
+- week: 12
+  day: 3
+  lecture: "MCMC (cont.)"
+  slides: 
+  screencast: 
+  readings:
+  notes: 
+
+- week: 12
+  day: 5
+  lecture: "MCMC (cont.)"
+  slides: 
+  screencast: 
+  readings:
+  notes: 
+
 
 
 - week: 13
