@@ -340,6 +340,7 @@ Explain why or why not broadcasting was able to be applied in each case.
 
 
 ```{r}
+#| echo: false
 countdown::countdown(5)
 ```
 
@@ -499,6 +500,7 @@ c = torch.rand(5,3)
 what reshaping is needed to make it possible so that `a * b` and `a * c` can be calculated via broadcasting?
 
 ```{r}
+#| echo: false
 countdown::countdown(3)
 ```
 
