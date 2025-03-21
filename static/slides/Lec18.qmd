@@ -1,6 +1,6 @@
 ---
 title: "pytorch - nn"
-subtitle: "Lecture 23"
+subtitle: "Lecture 18"
 author: "Dr. Colin Rundel"
 footer: "Sta 663 - Spring 2025"
 format:
