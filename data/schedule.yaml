@@ -232,7 +232,7 @@ schedule:
 - week: 10
   day: 5
   lecture: "torch - nn"
-  slides: 
+  slides: Lec18
   screencast: 
   readings:
   - text: Feedforward Neural Network with PyTorch
