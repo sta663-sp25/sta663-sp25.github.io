@@ -1418,7 +1418,7 @@ plt.show()
 
 ## Three layers
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 class three_layers(torch.nn.Module):
     def __init__(self, X, hidden_dim=100):
@@ -1452,13 +1452,14 @@ class three_layers(torch.nn.Module):
 
 ## Model results
 
+::: {.xsmall}
 ```{python}
 #| echo: false
 m5 = three_layers(X, hidden_dim=100)
 loss = m5.fit(X,y, n=10000)
 ```
 
-::: {.small}
+
 ```{python}
 #| echo: false
 plt.figure(figsize=(10,5), layout="constrained")
@@ -1476,7 +1477,7 @@ plt.show()
 
 ## Five layers
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 class five_layers(torch.nn.Module):
     def __init__(self, X, hidden_dim=100):
@@ -1514,7 +1515,7 @@ class five_layers(torch.nn.Module):
 
 ## Model results
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 #| echo: false
 m6 = five_layers(X, hidden_dim=100)
@@ -1534,4 +1535,4 @@ plt.plot(
 plt.legend()
 plt.show()
 ```
-:::
+
