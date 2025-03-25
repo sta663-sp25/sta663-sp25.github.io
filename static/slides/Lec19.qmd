@@ -28,8 +28,13 @@ import os
 
 plt.rcParams['figure.dpi'] = 200
 
+torch.set_printoptions(
+  edgeitems=30, linewidth=46,
+  precision = 4
+)
+
 np.set_printoptions(
-  edgeitems=30, linewidth=60,
+  edgeitems=30, linewidth=48,
   precision = 5, suppress=True
 )
 
@@ -40,6 +45,10 @@ pd.set_option("display.precision", 6)
 
 ```{r r_setup}
 #| include: false
+
+flexiblas::flexiblas_load_backend("ATLAS")
+flexiblas::flexiblas_switch(3)
+
 knitr::opts_chunk$set(
   fig.align="center",
   cache=FALSE
@@ -72,8 +81,13 @@ local({
     x = stringr::str_split(x, "\n")[[1]]
     #x = stringr::str_wrap(x, width = 120, exdent = 3)
     x = stringr::str_remove_all(x, "\r")
-    if (options$wrap)
+    if (options$wrap) {
         x = stringi::stri_wrap(x, width=120, exdent = 3, normalize=FALSE)
+    } else {
+        # Trim from of the profiling tables
+        n = x |> stringr::str_match("^\\s+") |> nchar() |> min(na.rm=TRUE)
+        x = stringr::str_remove(x, paste0("^ {",n,"}|^-{",n,"}"))
+    }
     x = paste(x, collapse="\n")
     
     #x = stringr::str_wrap(x, width = 100)
@@ -100,9 +114,9 @@ Core libraries:
 :::
 
 ::: {.column width='33%'}
-* cuFFT
-
 * cuTENSOR
+
+* cuFFT
 
 * cuRAND
 :::
@@ -118,7 +132,7 @@ Core libraries:
 
 ## CUDA Kernels
 
-::: {.small}
+::: {.xsmall}
 ```c
 // Kernel - Adding two matrices MatA and MatB
 __global__ void MatAdd(float MatA[N][N], float MatB[N][N], float MatC[N][N])
@@ -157,16 +171,16 @@ int main()
 
 ## GPU Status
 
-::: {.small}
-```{bash}
+::: {.xsmall}
+```{bash smi}
 nvidia-smi
 ```
 :::
 
 ## Torch GPU Information
 
-::: {.small}
-```{python}
+::: {.xsmall}
+```{python has_cuda}
 torch.cuda.is_available()
 
 torch.cuda.device_count()
@@ -184,9 +198,9 @@ torch.cuda.get_device_properties(1)
 
 Usage of the GPU is governed by the location of the Tensors - to use the GPU we allocate them on the GPU device.
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
-```{python}
+```{python tensor_devices}
 cpu = torch.device('cpu')
 cuda0 = torch.device('cuda:0')
 cuda1 = torch.device('cuda:1')
@@ -198,7 +212,8 @@ z = torch.rand(2,3, device=cpu); z
 :::
 
 ::: {.column width='50%' .fragment}
-```{python error=TRUE}
+```{python tensor_mult}
+#| error: true
 x @ y
 y @ z
 y @ z.to(cuda0)
@@ -211,8 +226,9 @@ y @ z.to(cuda0)
 
 NN layers (parameters) also need to be assigned to the GPU to be used with GPU tensors,
 
-::: {.small}
-```{python error=TRUE}
+::: {.xsmall}
+```{python nn1}
+#| error: true
 nn = torch.nn.Linear(5,5)
 X = torch.randn(10,5).cuda()
 ```
@@ -220,23 +236,24 @@ X = torch.randn(10,5).cuda()
 
 . . .
 
-::: {.small}
-```{python error=TRUE}
+::: {.xsmall}
+```{python nn2}
+#| error: true
 nn(X)
 ```
 :::
 
 . . .
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
-```{python}
+```{python nn3}
 nn.cuda()(X)
 ```
 :::
 
 ::: {.column width='50%'}
-```{python}
+```{python nn4}
 nn.to(device="cuda")(X)
 ```
 :::
@@ -247,8 +264,8 @@ nn.to(device="cuda")(X)
 
 Same MNIST data from last time (1x8x8 images),
 
-::: {.small}
-```{python}
+::: {.xsmall}
+```{python mnist}
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 
@@ -270,7 +287,7 @@ y_test = torch.from_numpy(y_test)
 
 To use the GPU for computation we need to copy these tensors to the GPU,
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 X_train_cuda = X_train.to(device=cuda0)
 y_train_cuda = y_train.to(device=cuda0)
@@ -282,7 +299,7 @@ y_test_cuda = y_test.to(device=cuda0)
 
 ## Convolutional NN
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 class mnist_conv_model(torch.nn.Module):
     def __init__(self, device):
@@ -325,7 +342,7 @@ class mnist_conv_model(torch.nn.Module):
 
 ## CPU vs Cuda
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 ```{python}
 m = mnist_conv_model(device="cpu")
@@ -345,9 +362,31 @@ m_cuda.accuracy(X_test_cuda, y_test_cuda)
 :::
 ::::
 
+. . .
+
+::: {.center .large}
+Why are the answers here different?
+:::
+
+. . .
+
+::: {.columns .xsmall}
+::: {.column}
+```{python}
+X_train.dtype
+```
+:::
+::: {.column}
+```{python}
+X_train_cuda.dtype
+```
+:::
+:::
+
+
 ## Performance
 
-:::: {.columns .small}
+:::: {.columns .xsmall}
 ::: {.column width='50%'}
 CPU performance:
 ```{python}
@@ -386,58 +425,62 @@ print(start.elapsed_time(end) / 1000)
 
 ## Profiling CPU - 1 forward step
 
-::: {.small}
+::: {.tiny}
 ```{python}
 m = mnist_conv_model(device="cpu")
 with torch.autograd.profiler.profile(with_stack=True, profile_memory=True) as prof_cpu:
     tmp = m(X_train)
 ```
 
-```{python, wrap=FALSE}
-print(prof_cpu.key_averages().table(sort_by='self_cpu_time_total', row_limit=5))
+```{python}
+#| wrap: false
+print(prof_cpu.key_averages().table(sort_by='self_cpu_time_total', row_limit=10))
 ```
 :::
 
 ## Profiling GPU - 1 forward step
 
-::: {.small}
+::: {.tiny}
 ```{python}
 m_cuda = mnist_conv_model(device="cuda")
 with torch.autograd.profiler.profile(with_stack=True) as prof_cuda:
     tmp = m_cuda(X_train_cuda)
 ```
 
-```{python, wrap=FALSE}
-print(prof_cuda.key_averages().table(sort_by='self_cpu_time_total', row_limit=5))
+```{python}
+#| wrap: false
+print(prof_cuda.key_averages().table(sort_by='self_cpu_time_total', row_limit=10))
 ```
 :::
 
 
 ## Profiling CPU - fit
 
-::: {.small}
+::: {.tiny}
 ```{python}
 m = mnist_conv_model(device="cpu")
 with torch.autograd.profiler.profile(with_stack=True, profile_memory=True) as prof_cpu:
     losses = m.fit(X_train, y_train, n=1000)
 ```
 
-```{python, wrap=FALSE}
-print(prof_cpu.key_averages().table(sort_by='self_cpu_time_total', row_limit=5))
+```{python}
+#| wrap: false
+print(prof_cpu.key_averages().table(sort_by='self_cpu_time_total', row_limit=10))
 ```
 :::
 
 ## Profiling GPU - fit
 
-::: {.small}
+::: {.tiny}
 ```{python}
 m_cuda = mnist_conv_model(device="cuda")
 with torch.autograd.profiler.profile(with_stack=True) as prof_cuda:
     losses = m_cuda.fit(X_train_cuda, y_train_cuda, n=1000)
 ```
 
-```{python, wrap=FALSE}
-print(prof_cuda.key_averages().table(sort_by='self_cpu_time_total', row_limit=5))
+```{python}
+#| wrap: false
+print(prof_cuda.key_averages().table(sort_by='self_cpu_time_total', row_limit=10))
 ```
 :::
 
@@ -447,13 +490,13 @@ print(prof_cuda.key_averages().table(sort_by='self_cpu_time_total', row_limit=5)
 
 <br/>
 
-::: {.small}
+::: {.xsmall}
 [homepage](https://www.cs.toronto.edu/~kriz/cifar.html)
 :::
 
 ## Loading the data
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 #| results: hide
 import torchvision
@@ -474,9 +517,11 @@ test_data = torchvision.datasets.CIFAR10(
 ```
 :::
 
+Downloads data to "/data/cifar-10-batches-py" which is ~178M on disk.
+
 ## CIFAR10 data
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 training_data.classes
 training_data.data.shape
@@ -486,7 +531,7 @@ test_data.data.shape
 
 . . .
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 training_data[0]
 ```
@@ -509,12 +554,13 @@ plt.show()
 
 ## Data Loaders
 
-```{python}
-batch_size = 100
+Torch handles large datasets and minibatches through the use of the `DataLoader` class, 
 
+::: {.xsmall}
+```{python}
 training_loader = torch.utils.data.DataLoader(
     training_data, 
-    batch_size=batch_size,
+    batch_size=100,
     shuffle=True,
     num_workers=4,
     pin_memory=True
@@ -522,32 +568,97 @@ training_loader = torch.utils.data.DataLoader(
 
 test_loader = torch.utils.data.DataLoader(
     test_data, 
-    batch_size=batch_size,
+    batch_size=100,
     shuffle=True,
     num_workers=4,
     pin_memory=True
 )
 ```
+:::
 
-## Loader generator
+## Loader as generator
 
+The resulting `DataLoader` is iterable and yields the features and targets for each batch,
+
+::: {.xsmall}
 ```{python}
 training_loader
 ```
+:::
 
 . . .
 
+::: {.xsmall}
 ```{python}
 X, y = next(iter(training_loader))
 X.shape
 y.shape
 ```
+:::
+
+## Custom Datasets
+
+::: {.small}
+In this case we got our data (`training_data` and `test_data`) directly from torchvision which gave us a `dataset` object to use with our `DataLoader`. If we do not have a `Dataset` object then we need to create a custom class for our data telling torch how to load it. 
+
+You class must define the methods: `__init__()`, `__len__()`, and `__get_item__()`.
+:::
+
+::: {.xsmall}
+```{python}
+class data(torch.utils.data.Dataset):
+    def __init__(self, X, y):
+        self.X = X
+        self.y = y
+    
+    def __len__(self):
+        return len(self.X)
+    
+    def __getitem__(self, idx):
+        return self.X[idx], self.y[idx]
+
+mnist_train = data(X_train, y_train)
+```
+:::
+
+## Custom loader
+
+::: {.xsmall}
+```{python}
+mnist_loader = torch.utils.data.DataLoader(
+    mnist_train, 
+    batch_size=1000,
+    shuffle=True
+)
+
+it = iter(mnist_loader)
+```
+:::
+
+::: {.columns .xsmall}
+::: {.column}
+```{python}
+X, y = next(it)
+X.shape
+y.shape
+```
+:::
+::: {.column}
+```{python}
+X, y = next(it)
+X.shape
+y.shape
+```
+:::
+:::
+
 
 
 ## CIFAR CNN
 
-::: {.small}
+::: {.xsmall}
 ```{python}
+#| code-line-numbers: "|2-19|2,4,19|24-42|27-34|37-40"
 class cifar_conv_model(torch.nn.Module):
     def __init__(self, device):
         super().__init__()
@@ -594,13 +705,13 @@ class cifar_conv_model(torch.nn.Module):
 :::
 
 ::: {.aside}
-Based on [source](https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html)
+Based on [PyTorch cifar10 tutorial](https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html)
 :::
 
 
 ## CNN Performance - CPU (1 step)
 
-::: {.small}
+::: {.tiny}
 ```{python}
 X, y = next(iter(training_loader))
 
@@ -612,14 +723,15 @@ with torch.autograd.profiler.profile(with_stack=True) as prof_cpu:
 ```
 
 ```{python, wrap=FALSE}
-print(prof_cpu.key_averages().table(sort_by='self_cpu_time_total', row_limit=5))
+#| code-overflow: scroll
+print(prof_cpu.key_averages().table(sort_by='self_cpu_time_total', row_limit=10))
 ```
 :::
 
 
 ## CNN Performance - GPU (1 step)
 
-::: {.small}
+::: {.tiny}
 ```{python}
 m_cuda = cifar_conv_model(device="cuda")
 Xc, yc = X.to(device="cuda"), y.to(device="cuda")
@@ -630,7 +742,7 @@ with torch.autograd.profiler.profile(with_stack=True) as prof_cuda:
 ```
 
 ```{python, wrap=FALSE}
-print(prof_cuda.key_averages().table(sort_by='self_cpu_time_total', row_limit=5))
+print(prof_cuda.key_averages().table(sort_by='self_cpu_time_total', row_limit=10))
 ```
 :::
 
@@ -639,7 +751,7 @@ print(prof_cuda.key_averages().table(sort_by='self_cpu_time_total', row_limit=5)
 
 ## CNN Performance - CPU (1 epoch)
 
-::: {.small}
+::: {.tiny}
 ```{python}
 m_cpu = cifar_conv_model(device="cpu")
 
@@ -648,13 +760,13 @@ with torch.autograd.profiler.profile(with_stack=True) as prof_cpu:
 ```
 
 ```{python, wrap=FALSE}
-print(prof_cpu.key_averages().table(sort_by='self_cpu_time_total', row_limit=5))
+print(prof_cpu.key_averages().table(sort_by='self_cpu_time_total', row_limit=10))
 ```
 :::
 
 ## CNN Performance - GPU (1 epoch)
 
-::: {.small}
+::: {.tiny}
 ```{python}
 m_cuda = cifar_conv_model(device="cuda")
 
@@ -663,7 +775,7 @@ with torch.autograd.profiler.profile(with_stack=True) as prof_cuda:
 ```
 
 ```{python, wrap=FALSE}
-print(prof_cuda.key_averages().table(sort_by='self_cpu_time_total', row_limit=5))
+print(prof_cuda.key_averages().table(sort_by='self_cpu_time_total', row_limit=10))
 ```
 :::
 
@@ -674,6 +786,7 @@ print(prof_cuda.key_averages().table(sort_by='self_cpu_time_total', row_limit=5)
 
 ## Loaders & Accuracy
 
+::: {.small}
 ```{python}
 def accuracy(model, loader, device):
     total, correct = 0, 0
@@ -688,14 +801,18 @@ def accuracy(model, loader, device):
             
     return correct / total
 ```
+:::
 
 
 ## Model fitting
 
-::: {.small}
+::: {.xsmall}
 ```{python eval=FALSE}
 m = cifar_conv_model("cuda")
 m.fit(training_loader, epochs=10, n_report=500, lr=0.01)
+```
+
+```
 ## [Epoch 1, Minibatch  500] loss: 2.098
 ## [Epoch 2, Minibatch  500] loss: 1.692
 ## [Epoch 3, Minibatch  500] loss: 1.482
@@ -709,11 +826,18 @@ m.fit(training_loader, epochs=10, n_report=500, lr=0.01)
 ```
 :::
 
-::: {.small}
+::: {.xsmall}
 ```{python eval=FALSE}
 accuracy(m, training_loader, "cuda")
+```
+```
 ## 0.63444
+```
+```{python}
+#| eval: false
 accuracy(m, test_loader, "cuda")
+```
+```
 ## 0.572
 ```
 :::
@@ -721,11 +845,14 @@ accuracy(m, test_loader, "cuda")
 
 ## More epochs
 
-If continue fitting with the existing model,
+If we fit again, Torch continues with the existing model,
 
-::: {.small}
+::: {.xsmall}
 ```{python eval=FALSE}
 m.fit(training_loader, epochs=10, n_report=500)
+```
+
+```
 ## [Epoch 11, Minibatch  500] loss: 0.885
 ## [Epoch 12, Minibatch  500] loss: 0.853
 ## [Epoch 13, Minibatch  500] loss: 0.839
@@ -740,17 +867,30 @@ m.fit(training_loader, epochs=10, n_report=500)
 
 ```{python eval=FALSE}
 accuracy(m, training_loader, "cuda")
+```
+
+```
 ## 0.73914
+```
+
+```{python}
+#| eval: false
 accuracy(m, test_loader, "cuda")
+```
+
+```
 ## 0.624
 ```
 :::
 
 ## More epochs (again)
 
-::: {.small}
+::: {.xsmall}
 ```{python eval=FALSE}
 m.fit(training_loader, epochs=10, n_report=500)
+```
+
+```
 ## [Epoch 21, Minibatch  500] loss: 0.764
 ## [Epoch 22, Minibatch  500] loss: 0.756
 ## [Epoch 23, Minibatch  500] loss: 0.748
@@ -765,15 +905,25 @@ m.fit(training_loader, epochs=10, n_report=500)
 
 ```{python eval=FALSE}
 accuracy(m, training_loader, "cuda")
+```
+
+```
 ## 0.76438
+```
+
+```{python}
+#| eval: false
 accuracy(m, test_loader, "cuda")
+```
+
+```
 ## 0.6217
 ```
 :::
 
 ## The VGG16 model
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 class VGG16(torch.nn.Module):
     def make_layers(self):
@@ -812,7 +962,7 @@ Based on code from [pytorch-cifar](https://github.com/kuangliu/pytorch-cifar), o
 
 ## Model
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 VGG16("cpu").model
 ```
@@ -821,7 +971,7 @@ VGG16("cpu").model
 
 ## VGG16 performance - CPU
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 X, y = next(iter(training_loader))
 m_cpu = VGG16(device="cpu")
@@ -832,14 +982,14 @@ with torch.autograd.profiler.profile(with_stack=True) as prof_cpu:
 ```
 
 ```{python, wrap=FALSE}
-print(prof_cpu.key_averages().table(sort_by='self_cpu_time_total', row_limit=5))
+print(prof_cpu.key_averages().table(sort_by='self_cpu_time_total', row_limit=10))
 ```
 :::
 
 
 ## VGG16 performance - GPU
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 m_cuda = VGG16(device="cuda")
 Xc, yc = X.to(device="cuda"), y.to(device="cuda")
@@ -850,14 +1000,14 @@ with torch.autograd.profiler.profile(with_stack=True) as prof_cuda:
 ```
 
 ```{python, wrap=FALSE}
-print(prof_cuda.key_averages().table(sort_by='self_cpu_time_total', row_limit=5))
+print(prof_cuda.key_averages().table(sort_by='self_cpu_time_total', row_limit=10))
 ```
 :::
 
 
 ## VGG16 performance - Apple M1 GPU (mps)
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 #| eval: false
 m_mps = VGG16(device="mps")
@@ -869,7 +1019,7 @@ with torch.autograd.profiler.profile(with_stack=True) as prof_mps:
 
 ```{python}
 #| eval: false
-print(prof_mps.key_averages().table(sort_by='self_cpu_time_total', row_limit=5))
+print(prof_mps.key_averages().table(sort_by='self_cpu_time_total', row_limit=10))
 ```
 
 ```
@@ -889,11 +1039,13 @@ Self CPU time total: 8.526ms
 
 ## Fitting w/ `lr = 0.01`
 
-::: {.small}
+::: {.xsmall}
 ```{python eval=FALSE}
 m = VGG16(device="cuda")
 fit(m, training_loader, epochs=10, n_report=500, lr=0.01)
+```
 
+```
 ## [Epoch 1, Minibatch  500] loss: 1.345
 ## [Epoch 2, Minibatch  500] loss: 0.790
 ## [Epoch 3, Minibatch  500] loss: 0.577
@@ -909,11 +1061,20 @@ fit(m, training_loader, epochs=10, n_report=500, lr=0.01)
 
 . . .
 
-::: {.small}
+::: {.xsmall}
 ```{python eval=FALSE}
 accuracy(model=m, loader=training_loader, device="cuda")
+```
+
+```
 ## 0.97008
+```
+```{python}
+#| eval: false
 accuracy(model=m, loader=test_loader, device="cuda")
+```
+
+```
 ## 0.8318
 ```
 :::
@@ -921,11 +1082,13 @@ accuracy(model=m, loader=test_loader, device="cuda")
 
 ## Fitting w/ `lr = 0.001`
 
-::: {.small}
+::: {.xsmall}
 ```{python eval=FALSE}
 m = VGG16(device="cuda")
 fit(m, training_loader, epochs=10, n_report=500, lr=0.001)
+```
 
+```
 ## [Epoch 1, Minibatch  500] loss: 1.279
 ## [Epoch 2, Minibatch  500] loss: 0.827
 ## [Epoch 3, Minibatch  500] loss: 0.599
@@ -941,18 +1104,28 @@ fit(m, training_loader, epochs=10, n_report=500, lr=0.001)
 
 . . .
 
-::: {.small}
+::: {.xsmall}
 ```{python eval=FALSE}
 accuracy(model=m, loader=training_loader, device="cuda")
+```
+
+```
 ## 0.9815
+```
+
+```{python}
+#| eval: false
 accuracy(model=m, loader=test_loader, device="cuda")
+```
+
+```
 ## 0.7816
 ```
 :::
 
 ## Report
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 from sklearn.metrics import classification_report
 
@@ -973,11 +1146,13 @@ def report(model, loader, device):
 
 ##
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 #| eval: false
 print(report(model=m, loader=test_loader, device="cuda"))
+```
 
+```
 ##               precision    recall  f1-score   support
 ## 
 ##     airplane       0.82      0.88      0.85      1000
@@ -998,7 +1173,7 @@ print(report(model=m, loader=test_loader, device="cuda"))
 :::
 
 
-# Some state-of-the-art examples
+# Some "state-of-the-art"<br/>models
 
 ## Hugging Face
 
@@ -1015,22 +1190,32 @@ Some notable resources,
 
 ## Stable Diffusion
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 #| warning: false
 #| message: false
 #| results: hide
-from diffusers import StableDiffusionPipeline
+import torch
+from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
 
-pipe = StableDiffusionPipeline.from_pretrained(
-  "stabilityai/stable-diffusion-2-1-base", torch_dtype=torch.float16
-).to("cuda")
+model_id = "/data/stable-diffusion-2-1"
+
+pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
+pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
+pipe.enable_model_cpu_offload()
 ```
 :::
 
+
 . . .
 
-::: {.small}
+::: {.xsmall}
+
+```{python sd1}
+#| results: hide
+prompt = "a picture of thomas bayes with a cat on his lap"
+```
+
 ```{python sd1-1}
 #| results: hide
 #| cache: true
@@ -1042,7 +1227,7 @@ fit = pipe(prompt, generator=generator, num_inference_steps=20, num_images_per_p
 
 . . .
 
-::: {.small}
+::: {.xsmall}
 ```{python sd1-2}
 #| cache: true
 fit.images
@@ -1070,10 +1255,9 @@ plt.show()
 
 ## Customizing prompts
 
-::: {.small}
-```{python sd2}
+::: {.xsmall}
+```{python sd2-0}
 #| results: hide
-#| cache: true
 prompt = "a picture of thomas bayes with a cat on his lap"
 prompts = [
   prompt + t for t in 
@@ -1085,7 +1269,11 @@ prompts = [
    "with flowery wall paper"
   ]
 ]
+```
 
+```{python sd2}
+#| results: hide
+#| cache: true
 generator = [torch.Generator(device="cuda").manual_seed(i) for i in range(6)]
 fit = pipe(prompts, generator=generator, num_inference_steps=20, num_images_per_prompt=1)
 ```
@@ -1109,8 +1297,8 @@ plt.show()
 
 ## Increasing inference steps
 
-::: {.small}
-```{python sd3}
+::: {.xsmall}
+```{python sd2-more}
 #| results: hide
 #| cache: true
 generator = [torch.Generator(device="cuda").manual_seed(i) for i in range(6)]
@@ -1118,7 +1306,65 @@ fit = pipe(prompts, generator=generator, num_inference_steps=50, num_images_per_
 ```
 :::
 
-```{python sd3-plot}
+```{python sd2-more-plot}
+#| echo: false
+#| cache: true
+fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(10, 6), layout="constrained")
+
+for i, ax in enumerate([ax for row in axes for ax in row]):
+    ax.set_axis_off()
+    p = ax.imshow(fit.images[i])
+    
+plt.show()
+```
+
+## A more current model
+
+::: {.small}
+This model is larger than the available GPU memory - so we adjust the weight types to make it fit.
+:::
+
+::: {.xsmall}
+```{python}
+from diffusers import BitsAndBytesConfig, SD3Transformer2DModel
+from diffusers import StableDiffusion3Pipeline
+import torch
+
+model_id = "/data/stable-diffusion-3.5-medium"
+
+nf4_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16
+)
+model_nf4 = SD3Transformer2DModel.from_pretrained(
+    model_id,
+    subfolder="transformer",
+    quantization_config=nf4_config,
+    torch_dtype=torch.bfloat16
+)
+
+pipe = StableDiffusion3Pipeline.from_pretrained(
+    model_id, 
+    transformer=model_nf4,
+    torch_dtype=torch.bfloat16
+)
+pipe.enable_model_cpu_offload()
+```
+:::
+
+## Images
+
+::: {.xsmall}
+```{python sd35}
+#| results: hide
+#| cache: true
+generator = [torch.Generator(device="cuda").manual_seed(i) for i in range(6)]
+fit = pipe(prompts, generator=generator, num_inference_steps=30, num_images_per_prompt=1)
+```
+:::
+
+```{python sd35-plot}
 #| echo: false
 #| cache: true
 fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(10, 6), layout="constrained")
@@ -1131,114 +1377,31 @@ plt.show()
 ```
 
 
+## LLM - Qwen2.5-3B
 
-
-## Alpaca LoRA
-
-::: {.small}
+::: {.xsmall}
 ```{python}
 #| eval: false
-from transformers import GenerationConfig, LlamaTokenizer, LlamaForCausalLM
+from transformers import pipeline
 
-tokenizer = LlamaTokenizer.from_pretrained("chainyo/alpaca-lora-7b")
+generator = pipeline('text-generation', model='Qwen/Qwen2.5-3B-Instruct')
+prompt = "Can you write me a short bed time story about Thomas Bayes and his pet cat? Limit the story to no more than three paragraphs.\n\n"
 
-model = LlamaForCausalLM.from_pretrained(
-    "chainyo/alpaca-lora-7b",
-    load_in_8bit=True,
-    torch_dtype=torch.float16,
-    device_map="auto",
+result = generator(
+    prompt, max_length=500, num_return_sequences=1,
+    truncation=True
 )
 
-generation_config = GenerationConfig(
-    temperature=0.2,
-    top_p=0.75,
-    top_k=40,
-    num_beams=4,
-    max_new_tokens=128,
-)
+print( result[0]['generated_text'] )
+```
+
+```
+Can you write me a short bed time story about Thomas Bayes and his pet cat? Limit the story to no more than three paragraphs.
+
+In a quiet corner of a small, cozy house lived Thomas Bayes, a man known for his clever mind but often found lost in thought. His favorite place was a little study where he spent most of his days pondering the mysteries of probability. One day, as he sat by the window watching the clouds drift by, he noticed a curious feline peeking through the curtains. Intrigued, he let the cat inside, naming it Bayes after himself, much to the cat's delight. The cat, with its sleek black fur and piercing green eyes, became Bayes' constant companion. They would sit together on Bayes' lap, discussing theories over soft purrs, until the night grew dark and Bayes retired to his study to continue his work, always with Bayes curled up at his feet, a silent witness to his intellectual journey. As the moonlight filtered through the windows, Bayes would drift off to sleep, dreaming of the future of statistics, with Bayes, his loyal and curious friend, by his side.
 ```
 :::
 
 ::: {.aside}
-Based on [chainyo/alpaca-lora-7b](https://huggingface.co/chainyo/alpaca-lora-7b), see also [alpaca lora](https://github.com/tloen/alpaca-lora), [stanform alpaca](https://github.com/tatsu-lab/stanford_alpaca) & [llama](https://ai.facebook.com/blog/large-language-model-llama-meta-ai/)
-:::
-
-## Generate a prompt
-
-::: {.small}
-```{python}
-#| include: false
-def generate_prompt(instruction, input_ctxt = None):
-    if input_ctxt:
-        return f"""Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
-
-### Instruction:
-{instruction}
-
-### Input:
-{input_ctxt}
-
-### Response:"""
-    else:
-        return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
-
-### Instruction:
-{instruction}
-
-### Response:"""
-```
-
-
-```{python}
-#| eval: false
-instruction = "Write a short childrens story about Thomas Bayes and his pet cat"
-input_ctxt = None 
-prompt = generate_prompt(instruction, input_ctxt)
-print(prompt)
-```
-
-```
-Below is an instruction that describes a task. Write a response that appropriately completes the request.
-
-### Instruction:
-Write a short childrens story about Thomas Bayes and his pet cat
-
-### Response:
-```
-:::
-
-
-## Running the model
-
-::: {.small}
-```{python}
-#| eval: false
-input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(model.device)
-
-with torch.no_grad():
-    outputs = model.generate(
-        input_ids=input_ids,
-        generation_config=generation_config,
-        return_dict_in_generate=True,
-        output_scores=True,
-    )
-
-response = tokenizer.decode(outputs.sequences[0], skip_special_tokens=True)
-print(response)
-```
-
-```
-Below is an instruction that describes a task. Write a response that appropriately completes the request.
-
-### Instruction:
-Write a short childrens story about Thomas Bayes and his pet cat
-
-### Response:
-Once upon a time, there was a little boy named Thomas Bayes. He had a pet cat named Fluffy, and 
-they were the best of friends. One day, Thomas and Fluffy decided to go on an adventure. They 
-traveled far and wide, exploring new places and meeting new people. Along the way, Thomas and 
-Fluffy learned many valuable lessons, such as the importance of friendship and the joy of discovery.
-Eventually, Thomas and Fluffy made their way back home, where they were welcomed with open arms. 
-Thomas and Fluffy had a wonderful time.
-```
+Qwen is an opensource LLM built by Alibaba
 :::

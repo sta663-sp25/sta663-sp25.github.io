@@ -113,3 +113,8 @@ blockquote {
 blockquote > p {
   margin-bottom: 0.5em !important;
 }
+
+.hscroll {
+  overflow-x: auto;
+  white-space: nowrap;
+}
