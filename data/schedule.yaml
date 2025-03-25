@@ -244,9 +244,13 @@ schedule:
 - week: 11
   day: 3
   lecture: "torch - gpu"
-  slides: 
+  slides Lec19: 
   screencast: 
   readings:
+  - text: Transformers
+    link: https://huggingface.co/docs/transformers/en/index
+  - text: diffusers
+    link: https://huggingface.co/docs/diffusers/index
   notes: 
 
 
