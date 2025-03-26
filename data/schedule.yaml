@@ -244,7 +244,7 @@ schedule:
 - week: 11
   day: 3
   lecture: "torch - gpu"
-  slides Lec19: 
+  slides: Lec19
   screencast: 
   readings:
   - text: Transformers
