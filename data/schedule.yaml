@@ -253,10 +253,33 @@ schedule:
     link: https://huggingface.co/docs/diffusers/index
   notes: 
 
-
-
 - week: 11
   day: 5
+  lecture: "MLOPs - Docker"
+  slides: 
+  screencast: 
+  readings:
+  notes: 
+
+- week: 12
+  day: 3
+  lecture: "MLOPs - FastAPI & Vetiver"
+  slides: 
+  screencast: 
+  readings:
+  notes: 
+
+- week: 12
+  day: 5
+  lecture: "MLOPs - Deploying"
+  slides: 
+  screencast: 
+  readings:
+  notes: 
+
+
+- week: 13
+  day: 3
   lecture: "MCMC"
   slides: 
   screencast: 
@@ -266,35 +289,9 @@ schedule:
   - text: ArviZ user guide
     link: https://python.arviz.org/en/stable/user_guide/index.html
 
-- week: 12
-  day: 3
-  lecture: "MCMC (cont.)"
-  slides: 
-  screencast: 
-  readings:
-  notes: 
-
-- week: 12
-  day: 5
-  lecture: "MCMC (cont.)"
-  slides: 
-  screencast: 
-  readings:
-  notes: 
-
-
-
-- week: 13
-  day: 3
-  lecture: "MLOPs - Linux admin"
-  slides: 
-  screencast: 
-  readings:
-  notes: 
-
 - week: 13
   day: 5
-  lecture: "MLOPs - Docker"
+  lecture: "MCMC (cont.)"
   slides: 
   screencast: 
   readings:
@@ -302,11 +299,13 @@ schedule:
 
 - week: 14
   day: 3
-  lecture: "MLOPs - Deploying"
+  lecture: "MCMC (cont.)"
   slides: 
   screencast: 
   readings:
   notes: 
+
+
 
 - week: 16
   day: 2
