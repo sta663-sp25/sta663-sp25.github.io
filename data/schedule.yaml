@@ -255,8 +255,8 @@ schedule:
 
 - week: 11
   day: 5
-  lecture: "MLOPs - Docker"
-  slides: 
+  lecture: "MLOPs - Basic Linux & Docker"
+  slides: Lec20
   screencast: 
   readings:
   notes: 
