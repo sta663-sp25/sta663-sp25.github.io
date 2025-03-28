@@ -22,7 +22,15 @@ knitr::opts_chunk$set(
 ```
 
 
+
 ## {background-image="imgs/Docker/linux_tree.png" background-size=contain}
+
+```{css}
+#| echo: false
+.reveal pre code {
+  text-wrap-mode: nowrap !important;
+}
+```
 
 ## 
 
@@ -188,6 +196,9 @@ This does not work 100% of the time but is generally pretty reliable,
 
 ## Filesystem Hierarchy Standard
 
+::: {.columns}
+::: {.column width=50%}
+
 ::: {.panel-tabset}
 
 ### Primary
@@ -254,6 +265,30 @@ cr173@algebra2 [~]$ tree -d -L 1 /usr
 :::
 :::
 
+:::
+::: {.column width=50% .small}
+
+<br/><br/><br/>
+
+Some common folders:
+
+* `/bin/` & `/usr/bin/` - executeables
+
+* `/etc/` - configuration files
+
+* `/lib*/` & `/usr/lib*/` - Static and shared libraries
+
+* `/usr/include/` - header files
+
+* `/home/` - home directories
+
+* `/var/` - logs
+
+* `/tmp/` - temporary files
+
+:::
+:::
+
 
 ::: {.aside}
 See Wikipedia's [Filesystem Hierarchy Standard](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) article
@@ -295,6 +330,7 @@ cr173@vcm-47003:~$ sudo apt update
 ```
 
 ```
+[sudo] password for cr173: 
 Hit:1 http://archive.linux.duke.edu/ubuntu focal InRelease
 Get:2 http://archive.linux.duke.edu/ubuntu focal-updates InRelease [114 kB]
 Hit:3 https://falcon-dl.oit.duke.edu/ubuntu focal InRelease
@@ -627,7 +663,7 @@ These are shared common components that are used by a variety of software on a l
 
 * Installed in `/lib`, `/usr/lib`, `/usr/local/lib`, etc.
 
-* Two flavors: static (`.a`) and dynamic (`.so`)
+* Two flavors: static (`.a`) and dynamic / shared (`.so`)
 
 ## `libcurl`
 
@@ -635,6 +671,7 @@ These are shared common components that are used by a variety of software on a l
 ```shell
 cr173@vcm-47003:~$ ls -la /usr/lib/x86_64-linux-gnu/libcurl*
 ```
+
 ```
 -rw-r--r-- 1 root root 1057632 Oct 29 08:10 /usr/lib/x86_64-linux-gnu/libcurl.a
 lrwxrwxrwx 1 root root      19 Oct 29 08:10 /usr/lib/x86_64-linux-gnu/libcurl-gnutls.so.3 -> libcurl-gnutls.so.4
@@ -825,7 +862,7 @@ hint: See PEP 668 for the detailed specification.
 ```
 :::
 
-### Forced
+### force
 
 ::: {.xsmall}
 ```shell
@@ -988,7 +1025,7 @@ See 'docker run --help'.
 
 <br/>
 
-This occurs when the docker daemon (service) is not running, this can be fixed by enabling the docker service / daemon, 
+This occurs when the docker daemon (service) is not running, this can be fixed by enabling & starting the docker service / daemon, 
 
 <br/>
 
@@ -1063,7 +1100,7 @@ See 'docker run --help'.
 
 . . .
 
-You must either be root or be a member of the `docker` group to use docker. Currently, your VM may or may not have a docker group and your account is likely not a member. If you are tired of typing sudo + your password there is an easy fix,
+You must either be root or be a member of the `docker` group to use docker. Currently, your VM may or may not have a docker group and your account is likely not a member. If you get tired of typing sudo + your password there is an easy fix,
 
 . . .
 
@@ -1279,7 +1316,7 @@ LOGO=ubuntu-logo
 ```
 :::
 
-::: {.column width='50%'}
+::: {.column width='50%' .fragment}
 ```shell
 docker run --rm ubuntu:24.10 cat /etc/os-release
 ```
@@ -1341,7 +1378,7 @@ VARIANT_ID=container
 
 
 
-## docker run - Important options
+## docker run common options
 
 <br/>
 ```
@@ -1380,6 +1417,7 @@ See <https://docs.docker.com/engine/reference/run/> for more details
 | `docker stop CONTAINER`                 | Stop a running container                     |
 | `docker start CONTAINER`                | Start a stopped container                    |
 | `docker attach CONTAINER`               | Attach to a running container                |
+| `docker exec CONTAINER CMD`             | Runs a new command in a running container    |
 | `docker commit CONTAINER REPO[:TAG]`    | Create an image from a container             |
 | `docker rename CONTAINER NAME`          | Rename a container                           |
 
@@ -1413,7 +1451,7 @@ See <https://docs.docker.com/engine/reference/run/> for more details
 ## {background-image="imgs/Docker/rocker_ver_sketch.png" background-size=contain}
 
 
-## {background-image="imgs/Docker/dockerhub_ubuntu.png" background-size=contain}
+## {background-image="imgs/Docker/Docker_python.png" background-size=contain}
 
 ## Docker + Python
 
@@ -1504,6 +1542,17 @@ root@0200ab573e93:/#
 
 ::: {.xsmall}
 ```shell
+docker ps
+```
+```
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+```
+:::
+
+. . .
+
+::: {.xsmall}
+```shell
 docker ps --all
 ```
 ```
@@ -1517,7 +1566,7 @@ fa52839a6bb0   python:latest   "bash"      4 seconds ago    Exited (0) 2 seconds
 
 ::: {.xsmall}
 ```shell
-docker run -it python:latest bash
+docker run python:latest
 ```
 ```
 root@e45df4642247:/# pip install numpy pandas seaborn
@@ -1599,7 +1648,7 @@ fa52839a6bb0   python:latest   "bash"      6 minutes ago        Exited (0) 6 min
 
 ::: {.xsmall}
 ```shell
-docker commit -m "Initial version of python-test" python-test python-test:latest
+docker commit python-test python-test:latest
 ```
 ```
 sha256:a69a3249750f888838192869a29cc035403c7cbe70a4c9be98fa1f6e3c2a9546
@@ -1626,7 +1675,6 @@ fedora                            latest    aa6787b90fe6   4 months ago     158M
 :::
 
 ## Using the image
-
 
 ::: {.xsmall}
 ```shell

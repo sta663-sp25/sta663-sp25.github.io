@@ -118,3 +118,7 @@ blockquote > p {
   overflow-x: auto;
   white-space: nowrap;
 }
+
+.nowrap {
+  text-wrap-mode: nowrap !important;
+}
