@@ -263,10 +263,12 @@ schedule:
 
 - week: 12
   day: 3
-  lecture: "MLOPs - FastAPI & Vetiver"
-  slides: 
+  lecture: "MLOPs - Docker & Vetiver"
+  slides: Lec21
   screencast: 
   readings:
+  - text: MLOps with Vetiver
+    link: https://vetiver.posit.co/
   notes: 
 
 - week: 12
