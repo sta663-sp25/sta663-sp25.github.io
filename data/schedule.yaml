@@ -273,10 +273,12 @@ schedule:
 
 - week: 12
   day: 5
-  lecture: "MLOPs - Deploying"
-  slides: 
+  lecture: "MLOPs - FastAPI"
+  slides: Lec 22
   screencast: 
   readings:
+  - text: FastAPI User Guide
+    link: https://fastapi.tiangolo.com/tutorial/
   notes: 
 
 
