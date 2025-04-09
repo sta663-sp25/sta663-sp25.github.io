@@ -284,8 +284,8 @@ schedule:
 
 - week: 13
   day: 3
-  lecture: "MCMC"
-  slides: 
+  lecture: "MCMC - PyMC"
+  slides: Lec23
   screencast: 
   readings:
   - text: PyMC introduction

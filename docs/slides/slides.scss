@@ -126,3 +126,20 @@ blockquote > p {
 kbd {
   font-size: 0.8em !important;
 }
+
+
+.reveal .cell-output pre {
+  text-wrap-mode: nowrap !important;
+  max-height: 520px !important;
+  overflow-y: scroll;
+}
+
+.reveal pre code {
+  text-wrap-mode: nowrap !important;
+  max-height: 520px !important;
+}
+
+pre.shell > code > span > a::before {
+  content: ">" !important;
+  color: #aaaaaa;
+}
