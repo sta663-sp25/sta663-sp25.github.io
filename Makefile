@@ -28,7 +28,7 @@ static/slides/%.html: static/slides/%.qmd
 	quarto render $<
 	
 static/slides/%.pdf: static/slides/%.html
-	Rscript -e "renderthis::to_pdf('$<')"
+	#Rscript -e "renderthis::to_pdf('$<')"
 
 push: build
 	git pull

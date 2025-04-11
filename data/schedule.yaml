@@ -295,8 +295,8 @@ schedule:
 
 - week: 13
   day: 5
-  lecture: "MCMC (cont.)"
-  slides: 
+  lecture: "MCMC - Samplers"
+  slides: Lec24
   screencast: 
   readings:
   notes: 
