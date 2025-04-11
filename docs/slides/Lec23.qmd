@@ -1,6 +1,6 @@
 ---
 title: "PyMC + ArviZ"
-subtitle: "Lecture 19"
+subtitle: "Lecture 23"
 author: "Dr. Colin Rundel"
 footer: "Sta 663 - Spring 2025"
 format:

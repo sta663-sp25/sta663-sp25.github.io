@@ -1,6 +1,6 @@
 ---
-title: "More PyMC"
-subtitle: "Lecture 20"
+title: "PyMC - Samplers"
+subtitle: "Lecture 24"
 author: "Dr. Colin Rundel"
 footer: "Sta 663 - Spring 2025"
 format:
@@ -11,6 +11,7 @@ format:
     self-contained: true
 execute: 
   echo: true
+  warning: true
 ---
 
 ```{python setup}
@@ -42,6 +43,7 @@ pd.set_option("display.precision", 6)
 ```
 
 ```{python helpers}
+#| include: false
 def offset(l, shift=False):
   res = [x for x in l for _ in range(2)]
   if shift:
@@ -77,9 +79,9 @@ def mh_trajectories(trace, colors = ["magenta","green","yellow","blue"], use_off
 ## Algorithm
 
 ::: {.medium}
-For a parameter of interest start with an initial value $\theta_0$ then for iteration $t+1$,
+For a parameter of interest start with an initial value $\theta_0$ then for the nex sample ($t+1$),
 
-1. Generate a proposal value $\theta'$ from a proposal distribution $q(x'|x_t)$.
+1. Generate a proposal value $\theta'$ from a proposal distribution $q(\theta'|\theta_t)$.
 
 2. Calculate the acceptance probability,
    $$
@@ -88,7 +90,7 @@ For a parameter of interest start with an initial value $\theta_0$ then for iter
 
    where $P(\theta|x)$ is the target posterior distribution.
 
-3. Accept proposal $\theta'$ with probability $\alpha$, if accepted $\theta_{t+1} = \theta'$ else $\theta_{t+1} = \theta$.
+3. Accept proposal $\theta'$ with probability $\alpha$, if accepted $\theta_{t+1} = \theta'$ else $\theta_{t+1} = \theta_t$.
 :::
 
 . . .
@@ -106,7 +108,7 @@ Some considerations:
 
 ## Banana Distribution
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 # Data
 n = 100
@@ -125,7 +127,7 @@ with pm.Model() as banana:
 ```
 :::
 
-## Visualizations
+## Joint posterior of x1 & x2
 
 ```{python}
 #| echo: false
@@ -139,6 +141,10 @@ plt.show()
 
 ## Metropolis-Hastings Sampler
 
+::: {.panel-tabset}
+
+### Model
+
 ::: {.small}
 ```{python}
 #| code-line-numbers: "|4|3"
@@ -146,24 +152,17 @@ with banana:
   mh = pm.sample(
     draws=100, tune=0,
     step=pm.Metropolis([x1,x2]),
-    chains=3, random_seed=1234
+    random_seed=1234
   )
 ```
 :::
 
-## Chains
+### Summary
 
-::: {.panel-tabset}
-
-### Raw values
-
-::: {.xsmall}
+::: {.small}
 ```{python}
-mh.posterior["x1"].sel(chain=0).values
-```
-
-```{python}
-mh.posterior["x2"].sel(chain=0).values
+#| echo: false
+az.summary(mh)
 ```
 :::
 
@@ -182,10 +181,8 @@ plt.legend()
 
 plt.show()
 ```
-:::
 
-
-## Trajectories
+### Trajectories
 
 ```{python}
 #| echo: false
@@ -196,40 +193,45 @@ sns.kdeplot(
   x="x1", y="x2", fill=True
 )
 
-mh_trajectories(mh)
+mh_trajectories(mh, use_offset=False)
 
 plt.show()
 ```
 
+### ACF
+
+```{python}
+#| echo: false
+ax = az.plot_autocorr(mh.sel(chain=0), max_lag=50)
+plt.show()
+```
+:::
 
 
-## Metropolis-Hastings Sampler with Tuning
+## MH with Tuning
 
-::: {.small}
+::: {.panel-tabset}
+
+### Model
+
+::: {.xsmall}
 ```{python}
 #| code-line-numbers: "|3"
 with banana:
-  mhwt = pm.sample(
+  mht = pm.sample(
     draws=100, tune=1000,
     step=pm.Metropolis([x1,x2]),
-    chains=3, random_seed=1234
+    random_seed=1234
   )
 ```
 :::
 
-## Chains
+### Summary
 
-::: {.panel-tabset}
-
-### Raw values
-
-::: {.xsmall}
+::: {.small}
 ```{python}
-mhwt.posterior["x1"].sel(chain=0).values
-```
-
-```{python}
-mhwt.posterior["x2"].sel(chain=0).values
+#| echo: false
+az.summary(mht)
 ```
 :::
 
@@ -239,19 +241,17 @@ mhwt.posterior["x2"].sel(chain=0).values
 #| echo: false
 plt.figure(layout="constrained")
 plt.subplot(211)
-plt.plot(mhwt.posterior["x1"].sel(chain=0).values, label="x1")
+plt.plot(mht.posterior["x1"].sel(chain=0).values, label="x1")
 plt.legend()
 
 plt.subplot(212)
-plt.plot(mhwt.posterior["x2"].sel(chain=0).values, label="x2")
+plt.plot(mht.posterior["x2"].sel(chain=0).values, label="x2")
 plt.legend()
 
 plt.show()
 ```
-:::
 
-
-## Trajectories
+### Trajectories
 
 ```{python}
 #| echo: false
@@ -262,10 +262,20 @@ sns.kdeplot(
   x="x1", y="x2", fill=True
 )
 
-mh_trajectories(mhwt)
+mh_trajectories(mht, use_offset=False)
 
 plt.show()
 ```
+
+### ACF
+
+```{python}
+#| echo: false
+ax = az.plot_autocorr(mht.sel(chain=0), max_lag=50)
+plt.show()
+```
+:::
+
 
 
 ## Effects of tuning / burn-in
@@ -274,9 +284,9 @@ There are two confounded effects from letting the sampler tune / burn-in:
 
 1. We have let the sampler run for 1000 iterations - this gives it a chance to find the area's of higher density and settle in. 
 
-  This almost makes each chain less sensitive to its initial starting position.
+   This also makes each chain less sensitive to their initial starting position.
 
-2. We have also tuned the size of our MH proposals to achieve a better acceptance rate - this lets the chains better explore our target distribution.
+2. We have also tuned the size of the MH proposals to achieve a better acceptance rates - this lets the chains better explore the target distribution.
 
 
 ## More samples?
@@ -285,15 +295,24 @@ There are two confounded effects from letting the sampler tune / burn-in:
 
 ### Model
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 #| code-line-numbers: "|3"
 with banana:
   mh_more = pm.sample(
     draws=1000, tune=1000,
     step=pm.Metropolis([x1,x2]),
-    chains=1, random_seed=1234
+    random_seed=1234
   )
+```
+:::
+
+### Summary
+
+::: {.small}
+```{python}
+#| echo: false
+az.summary(mh_more)
 ```
 :::
 
@@ -324,7 +343,7 @@ sns.kdeplot(
   x="x1", y="x2", fill=True
 )
 
-mh_trajectories(mh_more)
+mh_trajectories(mh_more, chains=[0])
 
 plt.show()
 ```
@@ -333,7 +352,7 @@ plt.show()
 
 ```{python}
 #| echo: false
-ax = az.plot_autocorr(mh_more, max_lag=50)
+ax = az.plot_autocorr(mh_more.sel(chain=0), max_lag=50)
 plt.show()
 ```
 :::
@@ -344,17 +363,27 @@ plt.show()
 
 ### Model
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 #| code-line-numbers: "|3"
 with banana:
-  mh_more = pm.sample(
+  mh_more2 = pm.sample(
     draws=10000, tune=1000,
     step=pm.Metropolis([x1,x2]),
-    chains=1, random_seed=1234
+    random_seed=1234
   )
 
-mh_more_thin = mh_more.sel(draw=slice(0,None,10))
+mh_more_thin = mh_more2.sel(draw=slice(0,None,10))
+```
+:::
+
+
+### Summary
+
+::: {.small}
+```{python}
+#| echo: false
+az.summary(mh_more_thin)
 ```
 :::
 
@@ -385,7 +414,7 @@ sns.kdeplot(
   x="x1", y="x2", fill=True
 )
 
-mh_trajectories(mh_more_thin)
+mh_trajectories(mh_more_thin, chains=[0])
 
 plt.show()
 ```
@@ -394,7 +423,7 @@ plt.show()
 
 ```{python}
 #| echo: false
-ax = az.plot_autocorr(mh_more_thin, max_lag=50)
+ax = az.plot_autocorr(mh_more_thin.sel(chain=0), max_lag=50)
 plt.show()
 ```
 :::
@@ -402,30 +431,30 @@ plt.show()
 
 ## Bivariate Normal Distribution
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 # Data
 n = 100
 y = pm.draw(pm.MvNormal.dist(mu=np.zeros(2), cov=np.eye(2,2), shape=(n,2)))
 
 # Model
-with pm.Model() as biv_normal:
+with pm.Model() as bv_normal:
   x1 = pm.Normal("x1", mu=0, sigma=1)
   x2 = pm.Normal("x2", mu=0, sigma=1)
 
   y = pm.MvNormal("y", mu=[x1,x2], cov=np.eye(2,2), observed=y)
 
-  bvn_trace = pm.sample(draws=10000, chains=1, random_seed=1234)
+  bv_trace = pm.sample(draws=10000, chains=1, random_seed=1234)
 ```
 :::
 
-## Visualizations
+## Joint posterior
 
 ```{python}
 #| echo: false
 plt.figure(layout="constrained")
 sns.kdeplot(
-  bvn_trace.posterior.to_dataframe(), 
+  bv_trace.posterior.to_dataframe(), 
   x="x1", y="x2", fill=True
 )
 plt.show()
@@ -438,15 +467,23 @@ plt.show()
 
 ### Model
 
-::: {.small}
+::: {.xsmall}
 ```{python}
-#| code-line-numbers: "|3"
-with biv_normal:
+with bv_normal:
   mh_bvn = pm.sample(
     draws=1000, tune=1000,
     step=pm.Metropolis([x1,x2]),
-    chains=1, random_seed=1234
+    random_seed=1234, cores=1
   )
+```
+:::
+
+### Summary
+
+::: {.small}
+```{python}
+#| echo: false
+az.summary(mh_bvn)
 ```
 :::
 
@@ -470,14 +507,13 @@ plt.show()
 
 ```{python}
 #| echo: false
-
 plt.figure(layout="constrained")
 sns.kdeplot(
-  bvn_trace.posterior.to_dataframe(), 
+  bv_trace.posterior.to_dataframe(), 
   x="x1", y="x2", fill=True
 )
 
-mh_trajectories(mh_bvn)
+mh_trajectories(mh_bvn, chains=[0])
 
 plt.show()
 ```
@@ -486,7 +522,7 @@ plt.show()
 
 ```{python}
 #| echo: false
-ax = az.plot_autocorr(mh_bvn, max_lag=50)
+ax = az.plot_autocorr(mh_bvn.sel(chain=0), max_lag=50)
 plt.show()
 ```
 :::
@@ -501,11 +537,11 @@ $$
 H(\theta, \rho) = -\underset{\text{potential}}{\log p(\theta)} - \underset{\text{kinetic}}{\log p(\rho|\theta)}
 $$
 
-Hamilton’s equations of motion state give a set of partial differential equations governing the motion of the "particles" in the system.
+Hamilton’s equations of motion state give a set of partial differential equations governing the motion of the "particle".
 
 A numerical integration method known as Leapfrog is then used to evolve the system some number of discrete steps forward in time. 
 
-Due to the numerical precision with the leapfrog integrator, a Metropolis acceptance step is typically used,
+Due to the approximate nature of the leapfrog integrator, a Metropolis acceptance step is typically used,
 $$
 \alpha = \min \left(1, \exp\left( H(\theta, \rho) - H(\theta',\rho') \right)
 \right)
@@ -553,14 +589,14 @@ with pm.Model() as banana:
 
 ### Model
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 #| code-line-numbers: "|4"
 with banana:
   hmc = pm.sample(
     draws=1000, tune=1000,
     step=pm.HamiltonianMC([x1,x2]),
-    chains=2, random_seed=1234
+    random_seed=1234
   )
 ```
 :::
@@ -617,13 +653,19 @@ plt.show()
 
 ## No-U-turn sampler (NUTS)
 
+::: {.medium}
 This is a variation of Hamiltonian monte carlo that automatically tunes the number of leapfrog steps to allow more effective exploration of the parameter space.
 
 Specifically, it uses a tree based algorithm that tracks trajectories forwards and backwards in time. The tree expands until a maximum depth is achieved or a "U-turn" is detected.
 
-![](imgs/nuts_path_extension.png){width=50% fig-align="center"}
+![](imgs/nuts_path_extension.png){width=40% fig-align="center"}
 
 NUTS also does not use a metropolis step to select the final parameter value, instead the sample is chosen among the valid candidates along the trajectory.
+:::
+
+::: {.aside}
+Figure from Hoffman and Gelman, 2014
+:::
 
 ## NUTS
 
@@ -631,14 +673,14 @@ NUTS also does not use a metropolis step to select the final parameter value, in
 
 ### Model
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 #| code-line-numbers: "|4"
 with banana:
   nuts = pm.sample(
     draws=1000, tune=1000,
     step=pm.NUTS([x1,x2]),
-    chains=2, random_seed=1234
+    random_seed=1234
   )
 ```
 :::
@@ -740,7 +782,7 @@ with banana:
   nuts2 = pm.sample(
     draws=1000, tune=1000,
     step=pm.NUTS([x1,x2], target_accept=0.9),
-    chains=2, random_seed=1234
+    random_seed=1234
   )
 ```
 :::
@@ -854,6 +896,7 @@ with pm.Model(coords = {"coeffs": X_lab}) as model:
 
 ::: {.small}
 ```{python}
+#| warning: false
 az.summary(post)
 ```
 :::
@@ -937,7 +980,7 @@ plt.show()
 ::: {.xsmall}
 ```{python}
 y, X = patsy.dmatrices(
-  "cases ~ year_min + year_min**2", 
+  "cases ~ year_min + I(year_min**2)", 
   aids.assign(year_min = lambda x: x.year-np.min(x.year))
 )
 
@@ -992,7 +1035,7 @@ plt.show()
 
 ## Model with a discrete parameter
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 import pytensor
 
