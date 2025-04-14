@@ -48,7 +48,7 @@ pd.set_option("display.precision", 6)
 
 ::: {.small}
 ```{python}
-d = pd.read_csv("data/gp.csv")
+d = pd.read_csv("data/gp2.csv")
 d
 
 n = d.shape[0]
