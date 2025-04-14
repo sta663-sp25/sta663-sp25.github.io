@@ -1,0 +1,366 @@
+---
+title: "MCMC - Performance"
+subtitle: "Lecture 25"
+author: "Dr. Colin Rundel"
+footer: "Sta 663 - Spring 2025"
+format:
+  revealjs:
+    theme: slides.scss
+    transition: fade
+    slide-number: true
+    self-contained: true
+execute: 
+  echo: true
+---
+
+```{python setup}
+#| include: false
+
+import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+import scipy
+
+import patsy
+
+import pymc as pm
+import arviz as az
+
+plt.rcParams['figure.dpi'] = 200
+
+np.set_printoptions(
+  edgeitems=30, linewidth=200,
+  precision = 5, suppress=True
+  #formatter=dict(float=lambda x: "%.5g" % x)
+)
+
+pd.set_option("display.width", 150)
+pd.set_option("display.max_columns", 10)
+pd.set_option("display.precision", 6)
+```
+
+
+# Example - Gaussian Process
+
+## Data
+
+::: {.small}
+```{python}
+d = pd.read_csv("data/gp.csv")
+d
+
+n = d.shape[0]
+D = np.array([ np.abs(xi - d.x) for xi in d.x])
+I = np.eye(n)
+```
+:::
+
+##
+
+::: {.small}
+```{python}
+fig = plt.figure(figsize=(12, 5))
+ax = sns.scatterplot(x="x", y="y", data=d)
+plt.show()
+```
+:::
+
+
+
+## GP model
+
+::: {.small}
+```{python}
+X = d.x.to_numpy().reshape(-1,1)
+y = d.y.to_numpy()
+
+with pm.Model() as model:
+  l = pm.Gamma("l", alpha=2, beta=1)
+  s = pm.HalfCauchy("s", beta=5)
+  nug = pm.HalfCauchy("nug", beta=5)
+
+  cov = s**2 * pm.gp.cov.ExpQuad(input_dim=1, ls=l)
+  gp = pm.gp.Marginal(cov_func=cov)
+
+  y_ = gp.marginal_likelihood(
+    "y", X=X, y=y, sigma=nug
+  )
+```
+:::
+
+## Model visualization
+
+```{python}
+pm.model_to_graphviz(model)
+```
+
+
+## MAP estimates
+
+::: {.small}
+
+```{python}
+with model:
+  gp_map = pm.find_MAP()
+```
+
+```
+|████████████████████████████████| 100.00% [22/22 00:00<00:00 logp = -134.97, ||grad|| = 0.0022539]
+```
+:::
+
+. . .
+
+::: {.small}
+```{python}
+gp_map
+```
+:::
+
+
+## Full Posterior Sampling
+
+::: {.small}
+```{python}
+with model:
+  post_nuts = pm.sample()
+```
+:::
+
+. . .
+
+::: {.small}
+```{python}
+az.summary(post_nuts)
+```
+:::
+
+
+## Trace plots
+
+::: {.small}
+```{python}
+ax = az.plot_trace(post_nuts)
+plt.show()
+```
+:::
+
+
+## Conditional Predictions (MAP)
+
+::: {.xsmall}
+```{python}
+X_new = np.linspace(0, 1.2, 121).reshape(-1, 1)
+
+with model:
+  y_pred = gp.conditional("y_pred", X_new)
+  pred_map = pm.sample_posterior_predictive(
+    [gp_map], var_names=["y_pred"], progressbar = False
+  )
+```
+
+:::
+
+
+
+. . .
+
+```{python}
+#| echo: false
+d_pred = pd.DataFrame({
+  "y": pred_map.posterior_predictive["y_pred"].values.reshape(-1),
+  "x": X_new.reshape(-1)
+})
+
+fig = plt.figure(figsize=(12, 5))
+ax = sns.scatterplot(x="x", y="y", data=d)
+ax = sns.lineplot(x="x", y="y", data=d_pred, color='red')
+plt.show()
+```
+
+
+## Conditional Predictions (thinned posterior)
+
+
+::: {.small}
+```{python}
+with model:
+  pred_post = pm.sample_posterior_predictive(
+    post_nuts.sel(draw=slice(None,None,10)), var_names=["y_pred"]
+  )
+```
+:::
+
+. . .
+
+```{python}
+#| echo: false
+fig = plt.figure(figsize=(12, 5))
+ax = sns.scatterplot(x="x", y="y", data=d)
+for y in pred_post.posterior_predictive["y_pred"][0]:
+  ax = plt.plot(X_new.reshape(-1), y, color='grey', alpha=0.1)
+ax = plt.plot(
+  X_new.reshape(-1), 
+  pred_post.posterior_predictive["y_pred"].mean(dim=["chain", "draw"]),
+  color='red', label="post mean"
+)
+l = plt.legend()
+plt.show()
+```
+
+
+## Conditional Predictions w/ nugget
+
+
+::: {.small}
+```{python}
+with model:
+  y_star = gp.conditional("y_star", X_new, pred_noise=True)
+  predn_post = pm.sample_posterior_predictive(
+    post_nuts.sel(draw=slice(None,None,10)), var_names=["y_star"]
+  )
+```
+:::
+
+. . .
+
+```{python}
+#| echo: false
+
+fig = plt.figure(figsize=(12, 5))
+ax = sns.scatterplot(x="x", y="y", data=d)
+for y in predn_post.posterior_predictive["y_star"][0]:
+  ax = plt.plot(X_new.reshape(-1), y, color='grey', alpha=0.1)
+ax = plt.plot(
+  X_new.reshape(-1), 
+  predn_post.posterior_predictive["y_star"].mean(dim=["chain", "draw"]),
+  color='red', label="post mean"
+)
+l = plt.legend()
+plt.show()
+```
+
+
+
+## Alternative NUTS samplers 
+
+Beyond the ability of PyMC to use different sampling steps - it can also use different sampler algorithm implementations to run your model.
+
+These can be changed via the `nuts_sampler` argument which currently supports:
+
+* `pymc` - standard sampler uses pymc's C backend
+
+* `blackjax` - uses the blackjax library which is a collection of samplers written for JAX
+
+* `numpyro` - probabilistic programming library for pyro built using JAX
+
+* `nutpie` - provides a wrapper to the `nuts-rs` Rust library (slight variation on NUTS compared to numpy & stan)
+
+
+
+## Performance
+
+::: {.small}
+```{python}
+%%timeit -r 3
+with model:
+  post_nuts = pm.sample(nuts_sampler="pymc", chains=4, progressbar=False)
+```
+
+```{python}
+%%timeit -r 3
+with model:
+    post_jax = pm.sample(nuts_sampler="blackjax", chains=4, progressbar=False)
+```
+
+```{python}
+%%timeit -r 3
+with model:
+    post_numpyro = pm.sample(nuts_sampler="numpyro", chains=4, progressbar=False)
+```
+
+```{python}
+%%timeit -r 3
+with model:
+    post_nutpie = pm.sample(nuts_sampler="nutpie", chains=4, progressbar=False)
+```
+:::
+
+
+
+```{python}
+#| echo: false
+with model:
+  post_nuts = pm.sample(nuts_sampler="pymc", chains=4, progressbar=False)
+
+with model:
+    post_jax = pm.sample(nuts_sampler="blackjax", chains=4, progressbar=False)
+
+with model:
+    post_numpyro = pm.sample(nuts_sampler="numpyro", chains=4, progressbar=False)
+
+with model:
+    post_nutpie = pm.sample(nuts_sampler="nutpie", chains=4, progressbar=False)
+```
+
+## Nutpie and compilation
+
+::: {.small}
+```{python}
+import nutpie
+
+compiled = nutpie.compile_pymc_model(model)
+```
+
+```{python}
+%%timeit -r 3
+post_nutpie = nutpie.sample(compiled,chains=4, progress_bar=False)
+```
+:::
+
+## JAX 
+
+::: {.xsmall}
+```{python}
+az.summary(post_jax)
+```
+
+```{python}
+#| echo: false
+ax = az.plot_trace(post_jax)
+plt.show()
+```
+:::
+
+## Numpyro NUTS sampler
+
+::: {.xsmall}
+```{python}
+az.summary(post_numpyro)
+```
+
+```{python}
+#| echo: false
+ax = az.plot_trace(post_numpyro)
+plt.show()
+```
+:::
+
+## nutpie sampler
+
+::: {.xsmall}
+```{python}
+az.summary(post_nutpie)
+```
+
+```{python}
+#| echo: false
+ax = az.plot_trace(post_nutpie)
+plt.show()
+```
+:::
+
+
+
