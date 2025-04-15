@@ -36,8 +36,6 @@ np.set_printoptions(
   #formatter=dict(float=lambda x: "%.5g" % x)
 )
 
-fa_file = '<svg aria-hidden="true" role="img" viewBox="0 0 384 512" style="height:1em;width:0.75em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M320 464c8.8 0 16-7.2 16-16V160H256c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320zM0 64C0 28.7 28.7 0 64 0H229.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64z"/></svg>'
-
 pd.set_option("display.width", 150)
 pd.set_option("display.max_columns", 10)
 pd.set_option("display.precision", 6)
@@ -51,13 +49,13 @@ At the moment both Python & R offer two variants of Stan:
 
 * `pystan` & `RStan` - native language interface to the underlying Stan C++ libraries
 
-  * Former does not play nicely with Jupyter (or quarto or positron) - see [here](https://pystan.readthedocs.io/en/latest/faq.html#how-can-i-use-pystan-with-jupyter-notebook-or-jupyterlab) for fix
+  * Former does not play nicely with Jupyter (or quarto or positron) - see [here](https://pystan.readthedocs.io/en/latest/faq.html#how-can-i-use-pystan-with-jupyter-notebook-or-jupyterlab) for a fix
 
 * `CmdStanPy` & `CmdStanR` - are wrappers around the `CmdStan` command line interface
   
   * Interface is through files (e.g. `model.stan`)
 
-Any of the above tools will require a modern C++ toolchain (requires C++17 support).
+Any of the above tools will require a modern C++ toolchain (C++17 support required).
 
 
 ## Stan process
@@ -118,15 +116,18 @@ generated quantities {
 
 ## Build & fit the model
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 from cmdstanpy import CmdStanModel
 model = CmdStanModel(stan_file='Lec25/bernoulli.stan')
-fit = model.sample(data='Lec25/bernoulli.json')
+```
+
+```{python}
+fit = model.sample(data='Lec25/bernoulli.json', show_progress=False)
 ```
 :::
 
-## Results
+. . .
 
 ::: {.xsmall}
 
@@ -139,7 +140,21 @@ fit
 ```
 :::
 
-## Summary
+## Posterior samples
+
+::: {.small}
+```{python}
+fit.stan_variables()
+```
+
+```{python}
+np.mean( fit.stan_variables()["theta"] )
+```
+:::
+
+
+
+## Summary & trace plots
 
 ::: {.small}
 ```{python}
@@ -147,7 +162,7 @@ fit.summary()
 ```
 :::
 
-## Trace plots
+. . .
 
 ::: {.xsmall}
 ```{python}
@@ -158,9 +173,215 @@ plt.show()
 
 ## Diagnostics
 
+::: {.columns .xsmall}
+::: {.column}
+```{python}
+fit.divergences
+```
+:::
+::: {.column}
+```{python}
+fit.max_treedepths
+```
+:::
+:::
+
+::: {.xsmall}
+
+```{python}
+fit.method_variables().keys()
+```
+:::
+
+. . .
+
 ::: {.xsmall}
 ```{python}
 print(fit.diagnose())
 ```
 :::
 
+# Gaussian process Example
+
+## GP model
+
+::: {.xsmall}
+::: {.code-file .sourceCode .cell-code}
+&nbsp; &nbsp; {{< fa file >}} &nbsp; `Lec25/gp.stan`
+:::
+```stan
+{{< include Lec25/gp.stan >}}
+```
+:::
+
+
+## Fit
+
+::: {.xsmall}
+```{python}
+d = pd.read_csv("data/gp2.csv").to_dict('list')
+d["N"] = len(d["x"])
+```
+```{python}
+#| warning: true
+gp = CmdStanModel(stan_file='Lec25/gp.stan')
+gp_fit = gp.sample(data=d, show_progress=False)
+```
+:::
+
+
+## Summary
+
+::: {.small}
+```{python}
+gp_fit.summary()
+```
+:::
+
+
+
+
+
+
+## Trace plots
+
+::: {.xsmall}
+```{python}
+ax = az.plot_trace(gp_fit, compact=False)
+plt.show()
+```
+:::
+
+## Diagnostics
+
+::: {.xsmall}
+```{python}
+gp_fit.divergences
+```
+```{python}
+gp_fit.max_treedepths
+```
+
+```{python}
+gp_fit.method_variables().keys()
+```
+:::
+
+. . .
+
+::: {.xsmall}
+```{python}
+print(gp_fit.diagnose())
+```
+:::
+
+
+## nutpie & stan
+
+The `nutpie` package can also be used to compile and run stan models, it uses a package called `bridgestan` to interface with stan.
+
+::: {.small}
+```{python}
+import nutpie
+m = nutpie.compile_stan_model(filename="Lec25/gp.stan")
+m = m.with_data(x=d["x"],y=d["y"],N=len(d["x"]))
+gp_fit_nutpie = nutpie.sample(m, chains=4)
+```
+:::
+
+## 
+
+::: {.xsmall}
+```{python}
+az.summary(gp_fit_nutpie)
+```
+:::
+
+::: {.xsmall}
+```{python}
+#| echo: false
+ax = az.plot_trace(gp_fit_nutpie, compact=False)
+plt.show()
+```
+:::
+
+
+## Performance
+
+::: {.small}
+``` {python}
+%%timeit -r 3
+gp_fit = gp.sample(data=d, show_progress=False)
+```
+:::
+
+::: {.small}
+``` {python}
+%%timeit -r 3
+gp_fit_nutpie = nutpie.sample(m, chains=4, progress_bar=False)
+```
+:::
+
+## Posterior predictive model
+
+::: {.xxsmall}
+::: {.code-file .sourceCode .cell-code}
+&nbsp; &nbsp; {{< fa file >}} &nbsp; `Lec25/gp2.stan`
+:::
+```stan
+{{< include Lec25/gp2.stan >}}
+```
+:::
+
+## Posterior predictive fit
+
+::: {.xsmall}
+```{python}
+d2 = pd.read_csv("data/gp2.csv").to_dict('list')
+d2["N"] = len(d2["x"])
+d2["xp"] = np.linspace(0, 1.2, 121)
+d2["Np"] = 121
+```
+```{python}
+#| warning: true
+gp2 = CmdStanModel(stan_file='Lec25/gp2.stan')
+gp2_fit = gp2.sample(data=d2, show_progress=False)
+```
+:::
+
+## Summary
+
+::: {.small}
+```{python}
+gp2_fit.summary()
+```
+:::
+
+## Draws
+
+::: {.xsmall}
+```{python}
+gp2_fit.stan_variable("f").shape
+```
+
+```{python}
+np.mean(gp2_fit.stan_variable("f"), axis=0)
+```
+:::
+
+## Plot
+
+```{python}
+#| echo: false
+fig = plt.figure(figsize=(12, 5))
+ax = sns.scatterplot(x="x", y="y", data=d2)
+for y in gp2_fit.stan_variable("f")[::40]:
+  ax = plt.plot(d2["xp"], y, color='grey', alpha=0.1)
+ax = plt.plot(
+  d2["xp"], 
+  np.mean(gp2_fit.stan_variable("f"), axis=0),
+  color='red', label="post mean"
+)
+l = plt.legend()
+plt.show()
+```

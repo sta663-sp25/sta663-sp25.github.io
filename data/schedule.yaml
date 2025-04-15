@@ -304,9 +304,13 @@ schedule:
 - week: 14
   day: 3
   lecture: "MCMC (cont.)"
-  slides: 
+  slides: Lec25
   screencast: 
   readings:
+  - text: CmdStanPy
+    link: https://mc-stan.org/cmdstanpy/users-guide.html
+  - text: Fundamentals of Stan
+    link: https://github.com/charlesm93/stanTutorial/tree/main/StanCon2023
   notes: 
 
 
