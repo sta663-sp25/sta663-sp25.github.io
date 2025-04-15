@@ -50,10 +50,6 @@ pd.set_option("display.precision", 6)
 ```{python}
 d = pd.read_csv("data/gp2.csv")
 d
-
-n = d.shape[0]
-D = np.array([ np.abs(xi - d.x) for xi in d.x])
-I = np.eye(n)
 ```
 :::
 
@@ -99,21 +95,16 @@ pm.model_to_graphviz(model)
 
 ## MAP estimates
 
-::: {.small}
-
+::: {.xsmall}
 ```{python}
 with model:
   gp_map = pm.find_MAP()
-```
-
-```
-|████████████████████████████████| 100.00% [22/22 00:00<00:00 logp = -134.97, ||grad|| = 0.0022539]
 ```
 :::
 
 . . .
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 gp_map
 ```
@@ -122,7 +113,7 @@ gp_map
 
 ## Full Posterior Sampling
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 with model:
   post_nuts = pm.sample()
@@ -131,7 +122,7 @@ with model:
 
 . . .
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 az.summary(post_nuts)
 ```
@@ -140,7 +131,7 @@ az.summary(post_nuts)
 
 ## Trace plots
 
-::: {.small}
+::: {.xsmall}
 ```{python}
 ax = az.plot_trace(post_nuts)
 plt.show()
@@ -181,7 +172,7 @@ plt.show()
 ```
 
 
-## Conditional Predictions (thinned posterior)
+## Conditional Predictions (thinned)
 
 
 ::: {.small}
@@ -262,6 +253,25 @@ These can be changed via the `nuts_sampler` argument which currently supports:
 
 ## Performance
 
+```{python}
+#| include: false
+
+X = d.x.to_numpy().reshape(-1,1)
+y = d.y.to_numpy()
+
+with pm.Model() as model:
+  l = pm.Gamma("l", alpha=2, beta=1)
+  s = pm.HalfCauchy("s", beta=5)
+  nug = pm.HalfCauchy("nug", beta=5)
+
+  cov = s**2 * pm.gp.cov.ExpQuad(input_dim=1, ls=l)
+  gp = pm.gp.Marginal(cov_func=cov)
+
+  y_ = gp.marginal_likelihood(
+    "y", X=X, y=y, sigma=nug
+  )
+```
+
 ::: {.small}
 ```{python}
 %%timeit -r 3
@@ -293,7 +303,7 @@ with model:
 ```{python}
 #| echo: false
 with model:
-  post_nuts = pm.sample(nuts_sampler="pymc", chains=4, progressbar=False)
+    post_nuts = pm.sample(nuts_sampler="pymc", chains=4, progressbar=False)
 
 with model:
     post_jax = pm.sample(nuts_sampler="blackjax", chains=4, progressbar=False)
@@ -310,7 +320,6 @@ with model:
 ::: {.small}
 ```{python}
 import nutpie
-
 compiled = nutpie.compile_pymc_model(model)
 ```
 
@@ -326,12 +335,18 @@ post_nutpie = nutpie.sample(compiled,chains=4, progress_bar=False)
 ```{python}
 az.summary(post_jax)
 ```
+:::
 
+::: {.columns}
+::: {.column width=16.6%}
+:::
+::: {.column width=66.6%}
 ```{python}
 #| echo: false
-ax = az.plot_trace(post_jax)
+ax = az.plot_trace(post_jax, figsize=(8,4))
 plt.show()
 ```
+:::
 :::
 
 ## Numpyro NUTS sampler
@@ -340,27 +355,36 @@ plt.show()
 ```{python}
 az.summary(post_numpyro)
 ```
+:::
 
+::: {.columns}
+::: {.column width=16.6%}
+:::
+::: {.column width=66.6%}
 ```{python}
 #| echo: false
-ax = az.plot_trace(post_numpyro)
+ax = az.plot_trace(post_numpyro, figsize=(8,4))
 plt.show()
 ```
+:::
 :::
 
 ## nutpie sampler
 
 ::: {.xsmall}
 ```{python}
-az.summary(post_nutpie)
-```
-
-```{python}
-#| echo: false
-ax = az.plot_trace(post_nutpie)
-plt.show()
+az.summary(post_nutpie.posterior[["l","s","nug"]])
 ```
 :::
 
-
-
+::: {.columns}
+::: {.column width=16.6%}
+:::
+::: {.column width=66.6%}
+```{python}
+#| echo: false
+ax = az.plot_trace(post_nutpie.posterior[["l","s","nug"]])
+plt.show()
+```
+:::
+:::
