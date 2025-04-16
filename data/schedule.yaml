@@ -303,7 +303,7 @@ schedule:
 
 - week: 14
   day: 3
-  lecture: "MCMC (cont.)"
+  lecture: "MCMC - Performance & Stan"
   slides: Lec25
   screencast: 
   readings:
