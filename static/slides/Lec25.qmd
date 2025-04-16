@@ -143,6 +143,7 @@ plt.show()
 
 ::: {.xsmall}
 ```{python}
+#| code-line-numbers: "|1|5-7|6"
 X_new = np.linspace(0, 1.2, 121).reshape(-1, 1)
 
 with model:
@@ -153,8 +154,6 @@ with model:
 ```
 
 :::
-
-
 
 . . .
 
@@ -177,6 +176,7 @@ plt.show()
 
 ::: {.small}
 ```{python}
+#| code-line-numbers: "|3"
 with model:
   pred_post = pm.sample_posterior_predictive(
     post_nuts.sel(draw=slice(None,None,10)), var_names=["y_pred"]
@@ -207,6 +207,7 @@ plt.show()
 
 ::: {.small}
 ```{python}
+#| code-line-numbers: "|2,4"
 with model:
   y_star = gp.conditional("y_star", X_new, pred_noise=True)
   predn_post = pm.sample_posterior_predictive(
@@ -241,13 +242,13 @@ Beyond the ability of PyMC to use different sampling steps - it can also use dif
 
 These can be changed via the `nuts_sampler` argument which currently supports:
 
-* `pymc` - standard sampler uses pymc's C backend
+* `pymc` - standard NUTS sampler using pymc's C backend
 
 * `blackjax` - uses the blackjax library which is a collection of samplers written for JAX
 
 * `numpyro` - probabilistic programming library for pyro built using JAX
 
-* `nutpie` - provides a wrapper to the `nuts-rs` Rust library (slight variation on NUTS compared to numpy & stan)
+* `nutpie` - provides a wrapper to the `nuts-rs` Rust library (slight variation on NUTS implementation)
 
 
 
@@ -401,7 +402,7 @@ At the moment both Python & R offer two variants of Stan:
 
 * `CmdStanPy` & `CmdStanR` - are wrappers around the `CmdStan` command line interface
   
-  * Interface is through files (e.g. `model.stan`)
+  * Interface is through files (e.g. `./model.stan`)
 
 Any of the above tools will require a modern C++ toolchain (C++17 support required).
 
@@ -427,19 +428,19 @@ data {
   // declares the required data for the model
 }
 transformed data {
-   // allows the definition of constants and transforms of the data
+   // allows the definition of constants and transformations of the data
 }
 parameters {
    // declares the model’s parameters
 }
 transformed parameters {
-   // allows variables to be defined in terms of data and parameters
+   // variables defined in terms of data and parameters
 }
 model {
    // defines the log probability function
 }
 generated quantities {
-   // allows derived quantities based on parameters, data, and random number generation
+   // derived quantities based on parameters, data, and random number generation
 }
 ```
 :::
@@ -645,13 +646,18 @@ az.summary(gp_fit_nutpie)
 ```
 :::
 
-::: {.xsmall}
+::: {.columns}
+::: {.column width=12.5%}
+:::
+::: {.column width=75%}
 ```{python}
 #| echo: false
 ax = az.plot_trace(gp_fit_nutpie, compact=False)
 plt.show()
 ```
 :::
+:::
+
 
 
 ## Performance
@@ -685,10 +691,11 @@ gp_fit_nutpie = nutpie.sample(m, chains=4, progress_bar=False)
 
 ::: {.xsmall}
 ```{python}
+Np = 121
 d2 = pd.read_csv("data/gp2.csv").to_dict('list')
 d2["N"] = len(d2["x"])
-d2["xp"] = np.linspace(0, 1.2, 121)
-d2["Np"] = 121
+d2["xp"] = np.linspace(0, 1.2, Np)
+d2["Np"] = Np
 ```
 ```{python}
 #| warning: true

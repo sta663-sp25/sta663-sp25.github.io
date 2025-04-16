@@ -1,12 +1,14 @@
 functions {
   // From https://mc-stan.org/docs/stan-users-guide/gaussian-processes.html#predictive-inference-with-a-gaussian-process
-  vector gp_pred_rng(array[] real x2,
-                     vector y1,
-                     array[] real x1,
-                     real alpha,
-                     real rho,
-                     real sigma,
-                     real delta) {
+  vector gp_pred_rng(
+    array[] real x2,
+    vector y1,
+    array[] real x1,
+    real alpha,
+    real rho,
+    real sigma,
+    real delta
+  ) {
     int N1 = rows(y1);
     int N2 = size(x2);
     vector[N2] f2;
@@ -55,15 +57,17 @@ parameters {
 model {
   // Covariance
   matrix[N, N] K = gp_exp_quad_cov(x, s, l);
-  matrix[N, N] L = cholesky_decompose(add_diag(K, nug^2));
+  K = add_diag(K, nug^2);
+  matrix[N, N] L = cholesky_decompose(K);
+  
   // priors
   l ~ gamma(2, 1);
   s ~ cauchy(0, 5);
   nug ~ cauchy(0, 1);
+  
   // model
   y ~ multi_normal_cholesky(rep_vector(0, N), L);
 }
 generated quantities {
-  // function scaled back to the original scale
   vector[Np] f = gp_pred_rng(xp, y, x, s, l, nug, delta);
 }
